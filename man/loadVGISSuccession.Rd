@@ -4,13 +4,13 @@
 \alias{loadVGISSuccession}
 \title{Load the card 16 succession interpretations (eo) data from Oracle database}
 \usage{
-loadVGISSuccession(userName, password, saveThem = FALSE,
+loadVGISSuccession(userName, passWord, saveThem = FALSE,
   savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}
 
-\item{password}{character, Specifies the password to the user name.}
+\item{passWord}{character, Specifies the password to the user name.}
 
 \item{saveThem}{logical, Specifies whether the loaded data should be saved or returned.
 The default value is FALSE, which means the function will not save files

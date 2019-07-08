@@ -2,7 +2,7 @@
 % Please edit documentation in R/loadISMC_bySiteName.R
 \name{loadISMC_bySiteName}
 \alias{loadISMC_bySiteName}
-\title{Load the data from ISMC Oracle database using site names}
+\title{Load the data from ISMC Oracle database using site name(s)}
 \usage{
 loadISMC_bySiteName(userName, passWord, siteName, savePath = ".",
   saveName, saveFormat = "rdata", overWrite = FALSE)
@@ -14,31 +14,31 @@ loadISMC_bySiteName(userName, passWord, siteName, savePath = ".",
 
 \item{siteName}{character, Site name.}
 
-\item{savePath}{character, Specifies the path to save your outputs, you do not need to
-specify if \code{saveThem} is turned off. If missing, the current working
+\item{savePath}{character, Specifies the path to save your outputs. If missing, the current working
 directory will be choosed.}
 
 \item{saveName}{character, Specifies the save name.}
 
 \item{saveFormat}{character, Specifies the format for the output data.
-It accepts \code{xlsx} and \code{rdata}. Default is \code{rdata}.}
+It accepts \code{rds}, \code{csv}, \code{txt}, \code{xlsx} and \code{rdata}.
+Default is \code{rdata}.}
 
 \item{overWrite}{logical, Determine if the file with same name as user specifies
 will be overwritten. Default is \code{FALSE}.}
 }
 \value{
-no value returned. There are 17 tables will be saved based on user's specifications.
-They are SampleSites, AccessNotes, PointLocation, PlotDetails,
-SampleSiteVisits, SampleMeasurements,
-GroundSampleCrewActivities, SiteNavigation,
-IntegratedPlotCenter, ReferencePoint, TiePoint,
-SmallLiveTreeTallies, StumpTallies,
-TreeMeasurements, TreeLogAssessments,
-TreeDamageOccurrences and TreeLossIndicators.
+No value returned. There are 16 tables will be saved with prefix of \code{saveName}.
+These tables are SampleSites, AccessNotes,
+SampleSiteVisits, GroundSampleCrewActivities, PlotDetails, SampleMeasurements,
+SmallLiveTreeTallies, TreeMeasurements, Trees, TreeDetails,
+TreeDamageOccurrences, TreeLossIndicators, TreeLogAssessments,
+StumpTallies, SiteNavigation,
+IntegratedPlotCenter, ReferencePoint and TiePoint.
+Note that if the save format is \code{xlsx}, all the tables will be saved into one workbook.
 }
 \description{
 This function is to load the ground sample data from ISMC database using
-site names.
+site name(s).
 }
 \author{
 Yong Luo

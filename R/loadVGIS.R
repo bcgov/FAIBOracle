@@ -1,10 +1,10 @@
-#' Load the data from Oracle database
+#' Load the data from VGIS Oracle database
 #'
 #'
 #' @description This function is to read the data from VGIS Oracle database
 #'
 #' @param userName character, Specifies a valid user name in VGIS Oracle database.
-#' @param password character, Specifies the password to the user name.
+#' @param passWord character, Specifies the password to the user name.
 #' @param saveThem logical, Specifies whether the loaded data should be saved or returned.
 #'                 The default value is FALSE, which means the function will not save files
 #'                 for you.
@@ -16,70 +16,70 @@
 #'
 #' @rdname loadVGIS
 #' @author Yong Luo
-loadVGIS <- function(userName, password,
+loadVGIS <- function(userName, passWord,
                      saveThem = FALSE, savePath = "."){
   loadVGISSample(userName = userName,
-                 password = password,
+                 passWord = passWord,
                  saveThem = saveThem,
                  savePath = savePath)
   loadVGISCrew(userName = userName,
-               password = password,
+               passWord = passWord,
                saveThem = saveThem,
                savePath = savePath)
   loadVGISSampleAccess(userName = userName,
-                       password = password,
+                       passWord = passWord,
                        saveThem = saveThem,
                        savePath = savePath)
   loadVGISPlot(userName = userName,
-               password = password,
+               passWord = passWord,
                saveThem = saveThem,
                savePath = savePath)
   loadVGISRange(userName = userName,
-                password = password,
+                passWord = passWord,
                 saveThem = saveThem,
                 savePath = savePath)
   loadVGISCWD(userName = userName,
-              password = password,
+              passWord = passWord,
               saveThem = saveThem,
               savePath = savePath)
   loadVGISTreeC(userName = userName,
-                password = password,
+                passWord = passWord,
                 saveThem = saveThem,
                 savePath = savePath)
   loadVGISLossIndicator(userName = userName,
-                        password = password,
+                        passWord = passWord,
                         saveThem = saveThem,
                         savePath = savePath)
   loadVGISSiteTree(userName = userName,
-                   password = password,
+                   passWord = passWord,
                    saveThem = saveThem,
                    savePath = savePath)
   loadVGISStumpSTree(userName = userName,
-                     password = password,
+                     passWord = passWord,
                      saveThem = saveThem,
                      savePath = savePath)
   loadVGISTreeI(userName = userName,
-                password = password,
+                passWord = passWord,
                 saveThem = saveThem,
                 savePath = savePath)
   loadVGISEcology(userName = userName,
-                  password = password,
+                  passWord = passWord,
                   saveThem = saveThem,
                   savePath = savePath)
   loadVGISVeg(userName = userName,
-              password = password,
+              passWord = passWord,
               saveThem = saveThem,
               savePath = savePath)
   loadVGISSuccession(userName = userName,
-                     password = password,
+                     passWord = passWord,
                      saveThem = saveThem,
                      savePath = savePath)
   loadVGISNotes(userName = userName,
-                password = password,
+                passWord = passWord,
                 saveThem = saveThem,
                 savePath = savePath)
   loadVGISPhoto(userName = userName,
-                password = password,
+                passWord = passWord,
                 saveThem = saveThem,
                 savePath = savePath)
 }

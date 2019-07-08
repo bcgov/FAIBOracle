@@ -4,13 +4,13 @@
 \alias{loadVGISSampleAccess}
 \title{Load the sample access data from Oracle database}
 \usage{
-loadVGISSampleAccess(userName, password, saveThem = FALSE,
+loadVGISSampleAccess(userName, passWord, saveThem = FALSE,
   savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}
 
-\item{password}{character, Specifies the password to the user name.}
+\item{passWord}{character, Specifies the password to the user name.}
 
 \item{saveThem}{logical, Specifies whether the loaded data should be saved or returned.
 The default value is FALSE, which means the function will not save files

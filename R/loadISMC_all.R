@@ -1,34 +1,32 @@
-#' Load the data from ISMC Oracle database using sample type
+#' Load all key data from ISMC Oracle database
 #'
 #'
-#' @description This function is to load the ground sample data from ISMC database using
-#'              sample type.
+#' @description This function is to load all the key ground sample data from ISMC database.
 #'
 #' @param userName character, Specifies a valid user name in ISMC Oracle database.
 #' @param passWord character, Specifies the password to the user name.
-#' @param savePath character, Specifies the path to save your outputs, you do not need to
-#'                 specify if \code{saveThem} is turned off. If missing, the current working
+#' @param savePath character, Specifies the path to save your outputs. If missing, the current working
 #'                 directory will be choosed.
 #'
 #' @param saveFormat character, Specifies the format for the output data.
-#'                   It accepts \code{xlsx}, \code{csv} and \code{rds}. Default is \code{rds}.
+#'                   It accepts \code{xlsx}, \code{csv}, \code{rds} and \code{txt}. Default is \code{rds}.
 #' @param overWrite logical, Determine if the file with same name as user specifies
 #'                           will be overwritten. Default is \code{FALSE}.
 #'
-#' @return no value returned. There are 17 tables will be saved based on user's specifications.
-#'         They are SampleSites, AccessNotes, PointLocation, PlotDetails,
-#'         SampleSiteVisits, SampleMeasurements,
-#'         GroundSampleCrewActivities, SiteNavigation,
-#'         IntegratedPlotCenter, ReferencePoint, TiePoint,
-#'         SmallLiveTreeTallies, StumpTallies,
-#'         TreeMeasurements, TreeLogAssessments,
-#'         TreeDamageOccurrences and TreeLossIndicators.
+#' @return No value returned. There are 19 tables will be saved with \code{ISMC_YYYYMMDDHHHH(ALL)_} as a prefix.
+#'         These tables are SampleSites, AccessNotes, Plots,
+#'         SampleSiteVisits, GroundSampleCrewActivities, PlotDetails, SampleMeasurements,
+#'         SmallLiveTreeTallies, TreeMeasurements, Trees, TreeDetails,
+#'         TreeDamageOccurrences, TreeLossIndicators, TreeLogAssessments,
+#'         StumpTallies, SiteNavigation,
+#'         IntegratedPlotCenter, ReferencePoint and TiePoint.
 #'
 #' @importFrom data.table ':=' data.table
 #' @importFrom dplyr '%>%'
 #' @importFrom ROracle dbConnect dbGetQuery dbDisconnect
 #' @importFrom DBI dbDriver
 #' @importFrom openxlsx write.xlsx
+#' @importFrom utils write.csv write.table
 #'
 #' @rdname loadISMC_all
 #' @author Yong Luo

@@ -2,7 +2,7 @@
 % Please edit documentation in R/loadISMC_all.R
 \name{loadISMC_all}
 \alias{loadISMC_all}
-\title{Load the data from ISMC Oracle database using sample type}
+\title{Load all key data from ISMC Oracle database}
 \usage{
 loadISMC_all(userName, passWord, savePath = ".", saveFormat = "rds",
   overWrite = FALSE)
@@ -12,29 +12,26 @@ loadISMC_all(userName, passWord, savePath = ".", saveFormat = "rds",
 
 \item{passWord}{character, Specifies the password to the user name.}
 
-\item{savePath}{character, Specifies the path to save your outputs, you do not need to
-specify if \code{saveThem} is turned off. If missing, the current working
+\item{savePath}{character, Specifies the path to save your outputs. If missing, the current working
 directory will be choosed.}
 
 \item{saveFormat}{character, Specifies the format for the output data.
-It accepts \code{xlsx}, \code{csv} and \code{rds}. Default is \code{rds}.}
+It accepts \code{xlsx}, \code{csv}, \code{rds} and \code{txt}. Default is \code{rds}.}
 
 \item{overWrite}{logical, Determine if the file with same name as user specifies
 will be overwritten. Default is \code{FALSE}.}
 }
 \value{
-no value returned. There are 17 tables will be saved based on user's specifications.
-They are SampleSites, AccessNotes, PointLocation, PlotDetails,
-SampleSiteVisits, SampleMeasurements,
-GroundSampleCrewActivities, SiteNavigation,
-IntegratedPlotCenter, ReferencePoint, TiePoint,
-SmallLiveTreeTallies, StumpTallies,
-TreeMeasurements, TreeLogAssessments,
-TreeDamageOccurrences and TreeLossIndicators.
+No value returned. There are 19 tables will be saved with \code{ISMC_YYYYMMDDHHHH(ALL)_} as a prefix.
+These tables are SampleSites, AccessNotes, Plots,
+SampleSiteVisits, GroundSampleCrewActivities, PlotDetails, SampleMeasurements,
+SmallLiveTreeTallies, TreeMeasurements, Trees, TreeDetails,
+TreeDamageOccurrences, TreeLossIndicators, TreeLogAssessments,
+StumpTallies, SiteNavigation,
+IntegratedPlotCenter, ReferencePoint and TiePoint.
 }
 \description{
-This function is to load the ground sample data from ISMC database using
-sample type.
+This function is to load all the key ground sample data from ISMC database.
 }
 \author{
 Yong Luo

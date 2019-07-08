@@ -5,7 +5,7 @@
 #'              is adapted from the first part of \code{cv_gys.sas}.
 #'
 #' @param userName character, Specifies a valid user name in GYS Oracle database.
-#' @param password character, Specifies the password to the user name.
+#' @param passWord character, Specifies the password to the user name.
 #' @param savePath character, Specifies the path to save your outputs, you do not need to
 #'                 specify if \code{saveThem} is turned off. If missing, the current working
 #'                 directory will be choosed.
@@ -19,12 +19,12 @@
 #'
 #' @rdname loadGYS
 #' @author Yong Luo
-loadGYS <- function(userName, password, savePath = file.path(".")){
+loadGYS <- function(userName, passWord, savePath = file.path(".")){
   drv <- dbDriver("Oracle")
   connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
   (HOST=nrk1-scan.bcgov)(PORT=1521))
   (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=DBP07.NRS.BCGOV)))"
-  con <- dbConnect(drv, username = userName, password = password,
+  con <- dbConnect(drv, username = userName, password = passWord,
                    dbname = connect.string)
 
   rcl_area_validn_codes <- dbGetQuery(con, "Select rcl_area_validn_skey ,

@@ -5,7 +5,7 @@
 #'              associated them with cluster.
 #'
 #' @param userName character, Specifies a valid user name in VGIS Oracle database.
-#' @param password character, Specifies the password to the user name.
+#' @param passWord character, Specifies the password to the user name.
 #' @param saveThem logical, Specifies whether the loaded data should be saved or returned.
 #'                 The default value is FALSE, which means the function will not save files
 #'                 for you.
@@ -27,13 +27,13 @@
 #'
 #' @rdname loadVGISTreeC
 #' @author Yong Luo
-loadVGISTreeC <- function(userName, password, saveThem = FALSE,
+loadVGISTreeC <- function(userName, passWord, saveThem = FALSE,
                                savePath = file.path(".")){
   drv <- dbDriver("Oracle")
   connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
   (HOST=nrk1-scan.bcgov)(PORT=1521))
   (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ENVPROD1.NRS.BCGOV)))"
-  con <- dbConnect(drv, username = userName, password = password,
+  con <- dbConnect(drv, username = userName, password = passWord,
                    dbname = connect.string)
   c8tree <- dbGetQuery(con, "SELECT
                        vgis.vgis_projects.PROJECT_SKEY        AS PROJ_KEY,

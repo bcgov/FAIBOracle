@@ -4,12 +4,12 @@
 \alias{loadGYS}
 \title{Load the data from GYS Oracle database}
 \usage{
-loadGYS(userName, password, savePath = file.path("."))
+loadGYS(userName, passWord, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in GYS Oracle database.}
 
-\item{password}{character, Specifies the password to the user name.}
+\item{passWord}{character, Specifies the password to the user name.}
 
 \item{savePath}{character, Specifies the path to save your outputs, you do not need to
 specify if \code{saveThem} is turned off. If missing, the current working

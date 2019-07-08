@@ -5,7 +5,7 @@
 #'              associated them with cluster.
 #'
 #' @param userName character, Specifies a valid user name in VGIS Oracle database.
-#' @param password character, Specifies the password to the user name.
+#' @param passWord character, Specifies the password to the user name.
 #' @param saveThem logical, Specifies whether the loaded data should be saved or returned.
 #'                 The default value is FALSE, which means the function will not save files
 #'                 for you.
@@ -27,13 +27,13 @@
 #'
 #' @rdname loadVGISRange
 #' @author Yong Luo
-loadVGISRange <- function(userName, password,
+loadVGISRange <- function(userName, passWord,
                           saveThem = FALSE, savePath = "."){
   drv <- dbDriver("Oracle")
   connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
   (HOST=nrk1-scan.bcgov)(PORT=1521))
   (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ENVPROD1.NRS.BCGOV)))"
-  con <- dbConnect(drv, username = userName, password = password,
+  con <- dbConnect(drv, username = userName, password = passWord,
                    dbname = connect.string)
   c4forage <- dbGetQuery(con, "SELECT
       vgis.PLOT_CLUSTERS.PLOT_CLUSTER_SKEY                        AS CL_KEY,

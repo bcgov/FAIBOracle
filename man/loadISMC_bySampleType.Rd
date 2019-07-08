@@ -2,7 +2,7 @@
 % Please edit documentation in R/loadISMC_bySampleType.R
 \name{loadISMC_bySampleType}
 \alias{loadISMC_bySampleType}
-\title{Load the data from ISMC Oracle database using sample type}
+\title{Load the data from ISMC Oracle database using sample type(s)}
 \usage{
 loadISMC_bySampleType(userName, passWord, sampleType, savePath = ".",
   saveFormat = "rdata", overWrite = FALSE)
@@ -12,10 +12,9 @@ loadISMC_bySampleType(userName, passWord, sampleType, savePath = ".",
 
 \item{passWord}{character, Specifies the password to the user name.}
 
-\item{sampleType}{character, Site type or types for BC ground sample inventory, such as \code{L}, \code{M}, \code{Y}.}
+\item{sampleType}{character, Site type or types for BC ground sample inventory, such as \code{L}, \code{M} and \code{Y}.}
 
-\item{savePath}{character, Specifies the path to save your outputs, you do not need to
-specify if \code{saveThem} is turned off. If missing, the current working
+\item{savePath}{character, Specifies the path to save your outputs. If missing, the current working
 directory will be choosed.}
 
 \item{saveFormat}{character, Specifies the format for the output data.
@@ -25,18 +24,17 @@ It accepts \code{xlsx} and \code{rdata}. Default is \code{rdata}.}
 will be overwritten. Default is \code{FALSE}.}
 }
 \value{
-no value returned. There are 17 tables will be saved based on user's specifications.
-They are SampleSites, AccessNotes, PointLocation, PlotDetails,
-SampleSiteVisits, SampleMeasurements,
-GroundSampleCrewActivities, SiteNavigation,
-IntegratedPlotCenter, ReferencePoint, TiePoint,
-SmallLiveTreeTallies, StumpTallies,
-TreeMeasurements, TreeLogAssessments,
-TreeDamageOccurrences and TreeLossIndicators.
+No value returned. There are 16 tables will be saved with prefix of \code{ISMC_YYYYMMDDHHHH(sampletype)_}.
+These tables are SampleSites, AccessNotes,
+SampleSiteVisits, GroundSampleCrewActivities, PlotDetails, SampleMeasurements,
+SmallLiveTreeTallies, TreeMeasurements, Trees, TreeDetails,
+TreeDamageOccurrences, TreeLossIndicators, TreeLogAssessments,
+StumpTallies, SiteNavigation,
+IntegratedPlotCenter, ReferencePoint and TiePoint.
 }
 \description{
 This function is to load the ground sample data from ISMC database using
-sample type.
+sample type(s).
 }
 \author{
 Yong Luo
