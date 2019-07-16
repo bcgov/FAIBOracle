@@ -12,6 +12,8 @@
 #' @importFrom dplyr '%>%'
 #' @importFrom ROracle dbConnect dbGetQuery dbDisconnect dbListTables
 #' @importFrom DBI dbDriver
+#' @export
+#'
 #' @seealso \code{\link{tablesInISMC}} and \code{\link{tablesInGYS}}
 #' @rdname tablesInVGIS
 #' @author Yong Luo

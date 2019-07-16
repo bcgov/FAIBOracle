@@ -27,6 +27,7 @@
 #' @importFrom DBI dbDriver
 #' @importFrom openxlsx write.xlsx
 #' @importFrom utils write.csv write.table
+#' @export
 #'
 #' @rdname loadISMC_all
 #' @author Yong Luo

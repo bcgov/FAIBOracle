@@ -9,3 +9,7 @@ devtools::build(args = "--no-multiarch")
 
 
 
+install.packages("C:/F/GitHub/FAIBOracle_0.0.0.9000.tar.gz",
+                 repos = NULL, INSTALL_opts = "--no-multiarch")
+
+

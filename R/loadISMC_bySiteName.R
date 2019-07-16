@@ -32,6 +32,7 @@
 #' @importFrom DBI dbDriver
 #' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
 #' @importFrom utils write.csv write.table
+#' @export
 #'
 #' @rdname loadISMC_bySiteName
 #' @author Yong Luo
@@ -242,15 +243,16 @@ loadISMC_bySiteName <- function(userName, passWord, siteName,
     data.table
   SampleMeasurements <- cleanColumns(SampleMeasurements, level = "site_visit")
 
-
   SmallLiveTreeTallies <-
     dbGetQuery(con,
                paste0("select
                       ss.sample_site_name,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      ssv.visit_number,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
-                      ssv.visit_number,
                       sm.measurement_date,
                       sltt.*
 
@@ -269,10 +271,13 @@ loadISMC_bySiteName <- function(userName, passWord, siteName,
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
 
+                      left join app_ismc.plot pt
+                      on pt.plot_guid = sm.plot_guid
+
                       where
                       ss.sample_site_name in ", siteName,
                       "order by
-                      sample_site_name, visit_number, tree_species_code, small_tree_tally_class_code")) %>%
+                      sample_site_name, plot_number, visit_number, tree_species_code, small_tree_tally_class_code")) %>%
     data.table
   SmallLiveTreeTallies <- cleanColumns(SmallLiveTreeTallies, level = "site_visit")
 

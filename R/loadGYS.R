@@ -16,6 +16,7 @@
 #' @importFrom dplyr '%>%'
 #' @importFrom ROracle dbConnect dbGetQuery dbDisconnect
 #' @importFrom DBI dbDriver
+#' @export
 #'
 #' @rdname loadGYS
 #' @author Yong Luo

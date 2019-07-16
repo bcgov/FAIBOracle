@@ -29,6 +29,7 @@
 #' @importFrom DBI dbDriver
 #' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
 #' @importFrom utils write.csv write.table
+#' @export
 #'
 #' @rdname loadISMC_bySampleType
 #' @author Yong Luo
@@ -319,6 +320,8 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                paste0("select
                       ss.sample_site_name,
                       ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -340,10 +343,13 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
 
+                      left join app_ismc.plot pt
+                      on pt.plot_guid = sm.plot_guid
+
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
                       "order by
-                      sample_site_name, visit_number, tree_species_code, small_tree_tally_class_code")) %>%
+                      sample_site_name, visit_number, plot_number, tree_species_code, small_tree_tally_class_code")) %>%
     data.table
   SmallLiveTreeTallies <- cleanColumns(SmallLiveTreeTallies, level = "site_visit")
   writeISMC(savePath = savePath, saveName = saveName,
@@ -423,7 +429,7 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
       rm(tm_chuncked)
       gc()
     } else {
-      newtreedata <- rbindlist(list(newtreedata, tm_chuncked))
+      newtreedata <- data.table::rbindlist(list(newtreedata, tm_chuncked))
       rm(tm_chuncked)
       gc()
     }

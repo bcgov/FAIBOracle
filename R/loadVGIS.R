@@ -12,7 +12,7 @@
 #'                                  \code{//Mayhem/GIS_TIB/RDW/RDW_Data2/Work_Areas/VRI_ASCII_PROD/vri_sa}.
 #'
 #' @return no files
-#'
+#' @export
 #'
 #' @rdname loadVGIS
 #' @author Yong Luo
