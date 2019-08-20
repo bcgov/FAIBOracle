@@ -61,9 +61,9 @@ loadISMC_bySiteName <- function(userName, passWord, siteName,
   }
 
   drv <- dbDriver("Oracle")
-  connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrc1-scan.bcgov)(PORT=1521)))
-  (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
+  connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+(HOST = nrcdb01.bcgov)(PORT = 1521)))
+(CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
@@ -75,7 +75,8 @@ loadISMC_bySiteName <- function(userName, passWord, siteName,
                       plc.utm_northing,
                       plc.utm_easting,
                       plc.elevation,
-                      plc.point_location_type_code
+                      plc.point_location_type_code,
+                      plc.coordinate_source_code
 
                       from
                       app_ismc.sample_site ss
@@ -576,7 +577,8 @@ loadISMC_bySiteName <- function(userName, passWord, siteName,
                       pl.utm_zone,
                       pl.utm_northing,
                       pl.utm_easting,
-                      pl.elevation
+                      pl.elevation,
+                      pl.coordinate_source_code
                       from
                       app_ismc.integrated_plot_center ipc
 
@@ -652,7 +654,8 @@ loadISMC_bySiteName <- function(userName, passWord, siteName,
                       plc.utm_zone,
                       plc.utm_northing,
                       plc.utm_easting,
-                      plc.elevation
+                      plc.elevation,
+                      plc.coordinate_source_code
 
                       from
                       app_ismc.tie_point tpt

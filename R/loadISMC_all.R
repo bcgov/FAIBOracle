@@ -45,9 +45,9 @@ loadISMC_all <- function(userName, passWord,
   saveName <- gsub("-", "", saveName)
 
   drv <- dbDriver("Oracle")
-  connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrc1-scan.bcgov)(PORT=1521)))
-  (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
+  connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+(HOST = nrcdb01.bcgov)(PORT = 1521)))
+(CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
@@ -59,10 +59,10 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.sample_site ss") %>%
     data.table
-SampleSites <- unlistGUID(SampleSites)
+  SampleSites <- unlistGUID(SampleSites)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "SampleSites", saveFormat = saveFormat,
-               thedata = SampleSites)
+            tableName = "SampleSites", saveFormat = saveFormat,
+            thedata = SampleSites)
   rm(SampleSites)
   gc()
 
@@ -76,8 +76,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   AccessNotes <- unlistGUID(AccessNotes)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "AccessNotes", saveFormat = saveFormat,
-               thedata = AccessNotes)
+            tableName = "AccessNotes", saveFormat = saveFormat,
+            thedata = AccessNotes)
   rm(AccessNotes)
   gc()
 
@@ -91,12 +91,34 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   Plots <- unlistGUID(Plots)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "Plots", saveFormat = saveFormat,
-               thedata = Plots)
+            tableName = "Plots", saveFormat = saveFormat,
+            thedata = Plots)
   rm(Plots)
   gc()
 
 
+  PointLocation  <-
+    dbGetQuery(con,
+               "select
+               plc.point_location_guid,
+               plc.bcgs_mapsheet_number,
+               plc.coordinate_source_code,
+               plc.elevation,
+               plc.point_location_type_code,
+               plc.utm_zone,
+               plc.utm_easting,
+               plc.utm_northing
+
+
+               from
+               app_ismc.point_location plc") %>%
+    data.table
+  PointLocation <- unlistGUID(PointLocation)
+  writeISMC(savePath = savePath, saveName = saveName,
+            tableName = "PointLocation", saveFormat = saveFormat,
+            thedata = PointLocation)
+  rm(PointLocation)
+  gc()
 
 
   SampleSiteVisits <-
@@ -109,8 +131,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   SampleSiteVisits <- unlistGUID(SampleSiteVisits)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "SampleSiteVisits", saveFormat = saveFormat,
-               thedata = SampleSiteVisits)
+            tableName = "SampleSiteVisits", saveFormat = saveFormat,
+            thedata = SampleSiteVisits)
   rm(SampleSiteVisits)
   gc()
 
@@ -125,9 +147,9 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   GroundSampleCrewActivities <- unlistGUID(GroundSampleCrewActivities)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "GroundSampleCrewActivities",
-               saveFormat = saveFormat,
-               thedata = GroundSampleCrewActivities)
+            tableName = "GroundSampleCrewActivities",
+            saveFormat = saveFormat,
+            thedata = GroundSampleCrewActivities)
   rm(GroundSampleCrewActivities)
   gc()
 
@@ -142,8 +164,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   PlotDetails <- unlistGUID(PlotDetails)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "PlotDetails", saveFormat = saveFormat,
-               thedata = PlotDetails)
+            tableName = "PlotDetails", saveFormat = saveFormat,
+            thedata = PlotDetails)
   rm(PlotDetails)
   gc()
 
@@ -158,8 +180,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   SampleMeasurements <- unlistGUID(SampleMeasurements)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "SampleMeasurements", saveFormat = saveFormat,
-               thedata = SampleMeasurements)
+            tableName = "SampleMeasurements", saveFormat = saveFormat,
+            thedata = SampleMeasurements)
   rm(SampleMeasurements)
   gc()
 
@@ -174,8 +196,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   SmallLiveTreeTallies <- unlistGUID(SmallLiveTreeTallies)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "SmallLiveTreeTallies", saveFormat = saveFormat,
-               thedata = SmallLiveTreeTallies)
+            tableName = "SmallLiveTreeTallies", saveFormat = saveFormat,
+            thedata = SmallLiveTreeTallies)
   rm(SmallLiveTreeTallies)
   gc()
 
@@ -189,8 +211,8 @@ SampleSites <- unlistGUID(SampleSites)
                app_ismc.tree_measurement tm") %>% data.table
   TreeMeasurements <- unlistGUID(TreeMeasurements)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "TreeMeasurements", saveFormat = saveFormat,
-               thedata = TreeMeasurements)
+            tableName = "TreeMeasurements", saveFormat = saveFormat,
+            thedata = TreeMeasurements)
   rm(TreeMeasurements)
   gc()
 
@@ -204,8 +226,8 @@ SampleSites <- unlistGUID(SampleSites)
                app_ismc.tree tr") %>% data.table
   Trees <- unlistGUID(Trees)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "Trees", saveFormat = saveFormat,
-               thedata = Trees)
+            tableName = "Trees", saveFormat = saveFormat,
+            thedata = Trees)
   rm(Trees)
   gc()
 
@@ -219,8 +241,8 @@ SampleSites <- unlistGUID(SampleSites)
                app_ismc.tree_detail td") %>% data.table
   TreeDetails <- unlistGUID(TreeDetails)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "TreeDetails", saveFormat = saveFormat,
-               thedata = TreeDetails)
+            tableName = "TreeDetails", saveFormat = saveFormat,
+            thedata = TreeDetails)
   rm(TreeDetails)
   gc()
 
@@ -235,8 +257,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   TreeDamageOccurrences <- unlistGUID(TreeDamageOccurrences)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "TreeDamageOccurrences", saveFormat = saveFormat,
-               thedata = TreeDamageOccurrences)
+            tableName = "TreeDamageOccurrences", saveFormat = saveFormat,
+            thedata = TreeDamageOccurrences)
   rm(TreeDamageOccurrences)
   gc()
 
@@ -251,8 +273,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   TreeLossIndicators <- unlistGUID(TreeLossIndicators)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "TreeLossIndicators", saveFormat = saveFormat,
-               thedata = TreeLossIndicators)
+            tableName = "TreeLossIndicators", saveFormat = saveFormat,
+            thedata = TreeLossIndicators)
   rm(TreeLossIndicators)
   gc()
 
@@ -266,8 +288,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   TreeLogAssessments <- unlistGUID(TreeLogAssessments)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "TreeLogAssessments", saveFormat = saveFormat,
-               thedata = TreeLogAssessments)
+            tableName = "TreeLogAssessments", saveFormat = saveFormat,
+            thedata = TreeLogAssessments)
   rm(TreeLogAssessments)
   gc()
 
@@ -282,8 +304,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   StumpTallies <- unlistGUID(StumpTallies)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "StumpTallies", saveFormat = saveFormat,
-               thedata = StumpTallies)
+            tableName = "StumpTallies", saveFormat = saveFormat,
+            thedata = StumpTallies)
   rm(StumpTallies)
   gc()
 
@@ -297,8 +319,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   SiteNavigation <- unlistGUID(SiteNavigation)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "SiteNavigation", saveFormat = saveFormat,
-               thedata = SiteNavigation)
+            tableName = "SiteNavigation", saveFormat = saveFormat,
+            thedata = SiteNavigation)
   rm(SiteNavigation)
   gc()
 
@@ -313,8 +335,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   IntegratedPlotCenter <- unlistGUID(IntegratedPlotCenter)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "IntegratedPlotCenter", saveFormat = saveFormat,
-               thedata = IntegratedPlotCenter)
+            tableName = "IntegratedPlotCenter", saveFormat = saveFormat,
+            thedata = IntegratedPlotCenter)
   rm(IntegratedPlotCenter)
   gc()
 
@@ -329,8 +351,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   ReferencePoint <- unlistGUID(ReferencePoint)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "ReferencePoint", saveFormat = saveFormat,
-               thedata = ReferencePoint)
+            tableName = "ReferencePoint", saveFormat = saveFormat,
+            thedata = ReferencePoint)
   rm(ReferencePoint)
   gc()
 
@@ -345,8 +367,8 @@ SampleSites <- unlistGUID(SampleSites)
     data.table
   TiePoint <- unlistGUID(TiePoint)
   writeISMC(savePath = savePath, saveName = saveName,
-               tableName = "TiePoint", saveFormat = saveFormat,
-               thedata = TiePoint)
+            tableName = "TiePoint", saveFormat = saveFormat,
+            thedata = TiePoint)
   rm(TiePoint)
   gc()
   dbDisconnect(con)

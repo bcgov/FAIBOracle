@@ -75,9 +75,9 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
   }
 
   drv <- dbDriver("Oracle")
-  connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrc1-scan.bcgov)(PORT=1521)))
-  (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
+  connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+(HOST = nrcdb01.bcgov)(PORT = 1521)))
+(CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
@@ -90,6 +90,7 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       plc.utm_easting,
                       plc.elevation,
                       plc.point_location_type_code,
+                      plc.coordinate_source_code,
                       pspss.*,
                       au.*,
                       cpn.*,
@@ -285,6 +286,8 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                paste0("select
                       ss.sample_site_name,
                       ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -295,6 +298,9 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
 
                       left join app_ismc.sample_site_visit ssv
                       on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guid = sm.plot_guid
 
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
@@ -704,7 +710,10 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       pl.utm_zone,
                       pl.utm_northing,
                       pl.utm_easting,
-                      pl.elevation
+                      pl.elevation,
+                      pl.point_location_type_code,
+                      pl.coordinate_source_code
+
                       from
                       app_ismc.integrated_plot_center ipc
 
@@ -789,7 +798,9 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       plc.utm_zone,
                       plc.utm_northing,
                       plc.utm_easting,
-                      plc.elevation
+                      plc.elevation,
+                      plc.point_location_type_code,
+                      plc.coordinate_source_code
 
                       from
                       app_ismc.tie_point tpt
