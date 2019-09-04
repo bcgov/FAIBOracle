@@ -112,11 +112,11 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       left join app_ismc.areal_unit au
                       on au.areal_unit_guid = pspss.areal_unit_guid
 
-                      left join app_ismc.compartment_number cpn
-                      on cpn.compartment_number_guid = au.compartment_number_guid
-
                       left join app_ismc.compartment_letter cpl
                       on cpl.compartment_letter_guid = au.compartment_letter_guid
+
+                      left join app_ismc.compartment_number cpn
+                      on ((cpn.compartment_number_guid = au.compartment_number_guid) or (cpn.compartment_number_guid = cpl.compartment_number_guid))
 
                       left join app_ismc.sampling_region srg
                       on srg.sampling_region_guid = cpn.sampling_region_guid
