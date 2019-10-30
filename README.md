@@ -49,6 +49,16 @@ steps:
 -   Install ROracle in CMD prompt using
     -   “C:/path/to/R/bin/x64/R” CMD INSTALL –build
         “C:/Your/Path/To/oracle/ROracle\_1.1-10.tar.gz”
+-   Sometimes, the include files in **C:\\oracle*?*?\\sdk\\include**
+    must be manually copied to **C:/path/to/R/include**, due to the
+    permission issue.
+
+After **ROracle** is installed, our package can be installed using
+following codes:
+
+    install.packages("path/to/FAIBOracle_??.tar.gz",
+                     repos = NULL, 
+                     INSTALL_opts = "--no-multiarch")
 
 ### Usage
 
