@@ -4,13 +4,17 @@
 \alias{loadISMC_all}
 \title{Load all key data from ISMC Oracle database}
 \usage{
-loadISMC_all(userName, passWord, savePath = ".", saveFormat = "rds",
-  overWrite = FALSE)
+loadISMC_all(userName, passWord, env, savePath = ".",
+  saveFormat = "rds", overWrite = FALSE)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}
 
 \item{passWord}{character, Specifies the password to the user name.}
+
+\item{env}{character, Specifies which environment the data reside. Currently,
+the function supports \code{INT} (intergration)
+and \code {TEST} (test) environment.}
 
 \item{savePath}{character, Specifies the path to save your outputs. If missing, the current working
 directory will be choosed.}

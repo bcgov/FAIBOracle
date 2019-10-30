@@ -5,6 +5,10 @@
 #'
 #' @param userName character, Specifies a valid user name in ISMC Oracle database.
 #' @param passWord character, Specifies the password to the user name.
+#' @param env character, Specifies which environment the data reside. Currently,
+#'                               the function supports \code{INT} (intergration)
+#'                               and \code {TEST} (test) environment.
+#'
 #' @param savePath character, Specifies the path to save your outputs. If missing, the current working
 #'                 directory will be choosed.
 #'
@@ -31,7 +35,7 @@
 #'
 #' @rdname loadISMC_all
 #' @author Yong Luo
-loadISMC_all <- function(userName, passWord,
+loadISMC_all <- function(userName, passWord, env,
                          savePath = ".",
                          saveFormat = "rds",
                          overWrite = FALSE){
@@ -45,9 +49,17 @@ loadISMC_all <- function(userName, passWord,
   saveName <- gsub("-", "", saveName)
 
   drv <- dbDriver("Oracle")
-  connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
-(HOST = nrcdb01.bcgov)(PORT = 1521)))
-(CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+  if(env == "TEST"){
+    connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+    (HOST = nrcdb01.bcgov)(PORT = 1521)))
+    (CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+  } else if (env == "INT"){
+    connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
+    (HOST=nrcdb01.bcgov)(PORT=1521)))
+    (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
+  } else {
+    stop("env must be specified either INT or TEST.")
+  }
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
@@ -59,7 +71,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.sample_site ss") %>%
     data.table
-  SampleSites <- unlistGUID(SampleSites)
+  SampleSites <- unlistGUIC(SampleSites)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SampleSites", saveFormat = saveFormat,
             thedata = SampleSites)
@@ -74,7 +86,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.access_note an") %>%
     data.table
-  AccessNotes <- unlistGUID(AccessNotes)
+  AccessNotes <- unlistGUIC(AccessNotes)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "AccessNotes", saveFormat = saveFormat,
             thedata = AccessNotes)
@@ -89,7 +101,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.plot pt") %>%
     data.table
-  Plots <- unlistGUID(Plots)
+  Plots <- unlistGUIC(Plots)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "Plots", saveFormat = saveFormat,
             thedata = Plots)
@@ -113,7 +125,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.point_location plc") %>%
     data.table
-  PointLocation <- unlistGUID(PointLocation)
+  PointLocation <- unlistGUIC(PointLocation)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "PointLocation", saveFormat = saveFormat,
             thedata = PointLocation)
@@ -129,7 +141,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.sample_site_visit ssv") %>%
     data.table
-  SampleSiteVisits <- unlistGUID(SampleSiteVisits)
+  SampleSiteVisits <- unlistGUIC(SampleSiteVisits)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SampleSiteVisits", saveFormat = saveFormat,
             thedata = SampleSiteVisits)
@@ -145,7 +157,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.ground_sample_crew_actvty gsca") %>%
     data.table
-  GroundSampleCrewActivities <- unlistGUID(GroundSampleCrewActivities)
+  GroundSampleCrewActivities <- unlistGUIC(GroundSampleCrewActivities)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "GroundSampleCrewActivities",
             saveFormat = saveFormat,
@@ -162,7 +174,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.plot_detail pd") %>%
     data.table
-  PlotDetails <- unlistGUID(PlotDetails)
+  PlotDetails <- unlistGUIC(PlotDetails)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "PlotDetails", saveFormat = saveFormat,
             thedata = PlotDetails)
@@ -178,7 +190,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.sample_measurement sm") %>%
     data.table
-  SampleMeasurements <- unlistGUID(SampleMeasurements)
+  SampleMeasurements <- unlistGUIC(SampleMeasurements)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SampleMeasurements", saveFormat = saveFormat,
             thedata = SampleMeasurements)
@@ -194,7 +206,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.small_live_tree_tally sltt") %>%
     data.table
-  SmallLiveTreeTallies <- unlistGUID(SmallLiveTreeTallies)
+  SmallLiveTreeTallies <- unlistGUIC(SmallLiveTreeTallies)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SmallLiveTreeTallies", saveFormat = saveFormat,
             thedata = SmallLiveTreeTallies)
@@ -209,7 +221,7 @@ loadISMC_all <- function(userName, passWord,
 
                from
                app_ismc.tree_measurement tm") %>% data.table
-  TreeMeasurements <- unlistGUID(TreeMeasurements)
+  TreeMeasurements <- unlistGUIC(TreeMeasurements)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "TreeMeasurements", saveFormat = saveFormat,
             thedata = TreeMeasurements)
@@ -224,7 +236,7 @@ loadISMC_all <- function(userName, passWord,
 
                from
                app_ismc.tree tr") %>% data.table
-  Trees <- unlistGUID(Trees)
+  Trees <- unlistGUIC(Trees)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "Trees", saveFormat = saveFormat,
             thedata = Trees)
@@ -239,7 +251,7 @@ loadISMC_all <- function(userName, passWord,
 
                from
                app_ismc.tree_detail td") %>% data.table
-  TreeDetails <- unlistGUID(TreeDetails)
+  TreeDetails <- unlistGUIC(TreeDetails)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "TreeDetails", saveFormat = saveFormat,
             thedata = TreeDetails)
@@ -255,7 +267,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.tree_damage_occurrence tdo") %>%
     data.table
-  TreeDamageOccurrences <- unlistGUID(TreeDamageOccurrences)
+  TreeDamageOccurrences <- unlistGUIC(TreeDamageOccurrences)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "TreeDamageOccurrences", saveFormat = saveFormat,
             thedata = TreeDamageOccurrences)
@@ -271,7 +283,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.tree_loss_indicator tli") %>%
     data.table
-  TreeLossIndicators <- unlistGUID(TreeLossIndicators)
+  TreeLossIndicators <- unlistGUIC(TreeLossIndicators)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "TreeLossIndicators", saveFormat = saveFormat,
             thedata = TreeLossIndicators)
@@ -286,7 +298,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.log_assessment la") %>%
     data.table
-  TreeLogAssessments <- unlistGUID(TreeLogAssessments)
+  TreeLogAssessments <- unlistGUIC(TreeLogAssessments)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "TreeLogAssessments", saveFormat = saveFormat,
             thedata = TreeLogAssessments)
@@ -302,7 +314,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.stump_tally st") %>%
     data.table
-  StumpTallies <- unlistGUID(StumpTallies)
+  StumpTallies <- unlistGUIC(StumpTallies)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "StumpTallies", saveFormat = saveFormat,
             thedata = StumpTallies)
@@ -317,7 +329,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.site_navigation sn") %>%
     data.table
-  SiteNavigation <- unlistGUID(SiteNavigation)
+  SiteNavigation <- unlistGUIC(SiteNavigation)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SiteNavigation", saveFormat = saveFormat,
             thedata = SiteNavigation)
@@ -333,7 +345,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.integrated_plot_center ipc") %>%
     data.table
-  IntegratedPlotCenter <- unlistGUID(IntegratedPlotCenter)
+  IntegratedPlotCenter <- unlistGUIC(IntegratedPlotCenter)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "IntegratedPlotCenter", saveFormat = saveFormat,
             thedata = IntegratedPlotCenter)
@@ -349,7 +361,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.reference_point rfp") %>%
     data.table
-  ReferencePoint <- unlistGUID(ReferencePoint)
+  ReferencePoint <- unlistGUIC(ReferencePoint)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "ReferencePoint", saveFormat = saveFormat,
             thedata = ReferencePoint)
@@ -365,7 +377,7 @@ loadISMC_all <- function(userName, passWord,
                from
                app_ismc.tie_point tpt") %>%
     data.table
-  TiePoint <- unlistGUID(TiePoint)
+  TiePoint <- unlistGUIC(TiePoint)
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "TiePoint", saveFormat = saveFormat,
             thedata = TiePoint)
@@ -373,6 +385,21 @@ loadISMC_all <- function(userName, passWord,
   gc()
   dbDisconnect(con)
 }
+
+
+
+unlistGUIC <- function(thedata){
+  allnames <- names(thedata)
+  guicnames <- allnames[grep("_guic", allnames)]
+  for(indiguicname in guicnames){
+    guics <- thedata[[indiguicname]]
+    thedata[, c(indiguicname):=NULL]
+    thedata[, c(indiguicname) := unlist(lapply(guics, function(s){paste0(unlist(s), collapse = "")}))]
+    rm(guics, indiguicname)
+  }
+  return(thedata)
+}
+
 
 
 
