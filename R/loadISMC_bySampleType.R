@@ -6,6 +6,9 @@
 #'
 #' @param userName character, Specifies a valid user name in ISMC Oracle database.
 #' @param passWord character, Specifies the password to the user name.
+#' @param env character, Specifies which environment the data reside. Currently,
+#'                               the function supports \code{INT} (intergration)
+#'                               and \code {TEST} (test) environment.
 #' @param sampleType character, Site type or types for BC ground sample inventory, such as \code{L}, \code{M} and \code{Y}.
 #' @param savePath character, Specifies the path to save your outputs. If missing, the current working
 #'                 directory will be choosed.
@@ -33,11 +36,11 @@
 #'
 #' @rdname loadISMC_bySampleType
 #' @author Yong Luo
-loadISMC_bySampleType <- function(userName, passWord, sampleType,
+loadISMC_bySampleType <- function(userName, passWord, env,
+                                  sampleType,
                                   savePath = ".",
                                   saveFormat = "rdata",
                                   overWrite = FALSE){
-
   thetime <- substr(as.character(Sys.time()), 12, 13)
   if(as.integer(thetime) < 12){
     thetime <- paste0(thetime, "am")
@@ -75,9 +78,17 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
   }
 
   drv <- dbDriver("Oracle")
-  connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
-(HOST = nrcdb01.bcgov)(PORT = 1521)))
-(CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+  if(env == "TEST"){
+    connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+    (HOST = nrcdb01.bcgov)(PORT = 1521)))
+    (CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+  } else if (env == "INT"){
+    connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
+    (HOST=nrcdb01.bcgov)(PORT=1521)))
+    (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
+  } else {
+    stop("env must be specified either INT or TEST.")
+  }
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
@@ -101,25 +112,25 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.sample_site ss
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_guid = ss.sample_site_guid
+                      on ssv.sample_site_guic = ss.sample_site_guic
 
                       left join app_ismc.point_location plc
-                      on ss.point_location_guid = plc.point_location_guid
+                      on ss.point_location_guic = plc.point_location_guic
 
                       left join app_ismc.psp_sample_site pspss
-                      on pspss.sample_site_guid = ss.sample_site_guid
+                      on pspss.sample_site_guic = ss.sample_site_guic
 
                       left join app_ismc.areal_unit au
-                      on au.areal_unit_guid = pspss.areal_unit_guid
+                      on au.areal_unit_guic = pspss.areal_unit_guic
 
                       left join app_ismc.compartment_letter cpl
-                      on cpl.compartment_letter_guid = au.compartment_letter_guid
+                      on cpl.compartment_letter_guic = au.compartment_letter_guic
 
                       left join app_ismc.compartment_number cpn
-                      on ((cpn.compartment_number_guid = au.compartment_number_guid) or (cpn.compartment_number_guid = cpl.compartment_number_guid))
+                      on ((cpn.compartment_number_guic = au.compartment_number_guic) or (cpn.compartment_number_guic = cpl.compartment_number_guic))
 
                       left join app_ismc.sampling_region srg
-                      on srg.sampling_region_guid = cpn.sampling_region_guid
+                      on srg.sampling_region_guic = cpn.sampling_region_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -150,10 +161,10 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.access_note an
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = an.sample_site_guid
+                      on ss.sample_site_guic = an.sample_site_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_guid = ss.sample_site_guid
+                      on ssv.sample_site_guic = ss.sample_site_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -181,10 +192,10 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.sample_site_visit ssv
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -216,19 +227,19 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.ground_sample_crew_actvty gsca
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = gsca.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = gsca.sample_site_visit_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_human_rsrce gshr
-                      on gshr.ground_sample_human_rsrce_guid = gsca.ground_sample_human_rsrce_guid
+                      on gshr.ground_sample_human_rsrce_guic = gsca.ground_sample_human_rsrce_guic
 
                       left join app_ismc.crew_certification cc
-                      on cc.ground_sample_human_rsrce_guid = gsca.ground_sample_human_rsrce_guid
+                      on cc.ground_sample_human_rsrce_guic = gsca.ground_sample_human_rsrce_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -258,16 +269,16 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.plot_detail pd
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = pd.plot_guid
+                      on pt.plot_guic = pd.plot_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = pd.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = pd.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -297,16 +308,16 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.sample_measurement sm
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = sm.plot_guid
+                      on pt.plot_guic = sm.plot_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -338,19 +349,19 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.small_live_tree_tally sltt
 
                       left join app_ismc.sample_measurement sm
-                      on sm.sample_measurement_guid = sltt.sample_measurement_guid
+                      on sm.sample_measurement_guic = sltt.sample_measurement_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = sm.plot_guid
+                      on pt.plot_guic = sm.plot_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -364,8 +375,6 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
   rm(SmallLiveTreeTallies)
   gc()
 
-
-
   TreeMeasurements <-
     dbGetQuery(con,
                paste0("select
@@ -376,39 +385,35 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       tr.*,
                       td.*,
                       tm.*,
-                      vtm.*,
-                      cmitd.*
+                      vtm.*
 
                       from
                       app_ismc.tree_measurement tm
 
                       left join app_ismc.tree tr
-                      on tr.tree_guid = tm.tree_guid
+                      on tr.tree_guic = tm.tree_guic
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = tr.plot_guid
+                      on pt.plot_guic = tr.plot_guic
 
                       left join app_ismc.vri_tree_measurement vtm
-                      on vtm.tree_measurement_guid = tm.tree_measurement_guid
+                      on vtm.tree_measurement_guic = tm.tree_measurement_guic
 
                       left join app_ismc.sample_measurement sm
-                      on sm.sample_measurement_guid = tm.sample_measurement_guid
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.tree_detail td
-                      on td.tree_guid = tm.tree_guid and
-                      td.sample_site_visit_guid = sm.sample_site_visit_guid
-
-                      left join app_ismc.chng_mntrng_inv_tree_dtl cmitd
-                      on cmitd.tree_detail_guid = td.tree_detail_guid
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -448,8 +453,6 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
   rm(newtreedata)
   gc()
 
-
-
   TreeDamageOccurrences <-
     dbGetQuery(con,
                paste0("select
@@ -468,37 +471,37 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.tree_damage_occurrence tdo
 
                       left join app_ismc.damage_agent_severity das
-                      on das.damage_agent_severity_guid = tdo.damage_agent_severity_guid
+                      on das.damage_agent_severity_guic = tdo.damage_agent_severity_guic
 
                       left join app_ismc.tree_measurement tm
-                      on tm.tree_measurement_guid = tdo.tree_measurement_guid
+                      on tm.tree_measurement_guic = tdo.tree_measurement_guic
 
                       left join app_ismc.sample_measurement sm
-                      on sm.sample_measurement_guid = tm.sample_measurement_guid
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       left join app_ismc.tree tr
-                      on tr.tree_guid = tm.tree_guid
+                      on tr.tree_guic = tm.tree_guic
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = tr.plot_guid
+                      on pt.plot_guic = tr.plot_guic
 
-                      left join app_ismc.tree_detail td on td.tree_guid = tm.tree_guid
-                      and td.sample_site_visit_guid = sm.sample_site_visit_guid
+                      left join app_ismc.tree_detail td on td.tree_guic = tm.tree_guic
+                      and td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
                       "order by
                       sample_site_name, visit_number, plot_category_code,
-                      plot_number, tree_number, damage_order")) %>%
+                      plot_number, tree_number, sequence_number")) %>%
     data.table
 
   TreeDamageOccurrences <- cleanColumns(TreeDamageOccurrences, level = "tree")
@@ -528,29 +531,29 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.tree_loss_indicator tli
 
                       left join app_ismc.tree_measurement tm
-                      on tm.tree_measurement_guid = tli.tree_measurement_guid
+                      on tm.tree_measurement_guic = tli.tree_measurement_guic
 
                       left join app_ismc.sample_measurement sm
-                      on sm.sample_measurement_guid = tm.sample_measurement_guid
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       left join app_ismc.tree tr
-                      on tr.tree_guid = tm.tree_guid
+                      on tr.tree_guic = tm.tree_guic
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = tr.plot_guid
+                      on pt.plot_guic = tr.plot_guic
 
                       left join app_ismc.tree_detail td
-                      on td.tree_guid = tm.tree_guid and
-                      td.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -583,32 +586,32 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.log_assessment la
 
                       left join app_ismc.vri_tree_measurement vtm
-                      on vtm.vri_tree_measurement_guid = la.vri_tree_measurement_guid
+                      on vtm.vri_tree_measurement_guic = la.vri_tree_measurement_guic
 
                       left join app_ismc.tree_measurement tm
-                      on tm.tree_measurement_guid = vtm.tree_measurement_guid
+                      on tm.tree_measurement_guic = vtm.tree_measurement_guic
 
                       left join app_ismc.sample_measurement sm
-                      on sm.sample_measurement_guid = tm.sample_measurement_guid
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       left join app_ismc.tree tr
-                      on tr.tree_guid = tm.tree_guid
+                      on tr.tree_guic = tm.tree_guic
 
                       left join app_ismc.plot pt
-                      on pt.plot_guid = tr.plot_guid
+                      on pt.plot_guic = tr.plot_guic
 
                       left join app_ismc.tree_detail td
-                      on td.tree_guid = tm.tree_guid and
-                      td.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -638,19 +641,19 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.stump_tally st
 
                       left join app_ismc.vri_sample_measurement vsm
-                      on vsm.vri_sample_measurement_guid = st.vri_sample_measurement_guid
+                      on vsm.vri_sample_measurement_guic = st.vri_sample_measurement_guic
 
                       left join app_ismc.sample_measurement sm
-                      on sm.sample_measurement_guid = vsm.sample_measurement_guid
+                      on sm.sample_measurement_guic = vsm.sample_measurement_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sm.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -678,13 +681,13 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.site_navigation sn
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sn.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sn.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -718,19 +721,19 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.integrated_plot_center ipc
 
                       left join app_ismc.site_navigation sn
-                      on sn.site_navigation_guid = ipc.site_navigation_guid
+                      on sn.site_navigation_guic = ipc.site_navigation_guic
 
                       left join app_ismc.point_location pl
-                      on pl.point_location_guid = ipc.point_location_guid
+                      on pl.point_location_guic = ipc.point_location_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sn.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sn.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -759,19 +762,19 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.reference_point rfp
 
                       left join app_ismc.site_navigation sn
-                      on sn.site_navigation_guid = rfp.site_navigation_guid
+                      on sn.site_navigation_guic = rfp.site_navigation_guic
 
                       left join app_ismc.reference_feature rff
-                      on rff.reference_point_guid = rfp.reference_point_guid
+                      on rff.reference_point_guic = rfp.reference_point_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sn.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sn.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -806,22 +809,22 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
                       app_ismc.tie_point tpt
 
                       left join app_ismc.site_navigation sn
-                      on sn.site_navigation_guid = tpt.site_navigation_guid
+                      on sn.site_navigation_guic = tpt.site_navigation_guic
 
                       left join app_ismc.reference_feature rff
-                      on rff.tie_point_guid = tpt.tie_point_guid
+                      on rff.tie_point_guic = tpt.tie_point_guic
 
                       left join app_ismc.point_location plc
-                      on plc.point_location_guid = tpt.point_location_guid
+                      on plc.point_location_guic = tpt.point_location_guic
 
                       left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_visit_guid = sn.sample_site_visit_guid
+                      on ssv.sample_site_visit_guic = sn.sample_site_visit_guic
 
                       left join app_ismc.sample_site ss
-                      on ss.sample_site_guid = ssv.sample_site_guid
+                      on ss.sample_site_guic = ssv.sample_site_guic
 
                       left join app_ismc.ground_sample_project gsp
-                      on gsp.ground_sample_project_guid = ssv.ground_sample_project_guid
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -840,7 +843,7 @@ loadISMC_bySampleType <- function(userName, passWord, sampleType,
 
 cleanColumns <- function(thedata, level){
   indifiledata_names <- names(thedata)
-  indifiledata_names_noid <- indifiledata_names[-grep("_GUID", indifiledata_names)]
+  indifiledata_names_noid <- indifiledata_names[-grep("_GUIC", indifiledata_names)]
   if(length(indifiledata_names_noid) == 0){
     indifiledata_names_noid <- indifiledata_names
   }
@@ -890,16 +893,3 @@ writeISMC <- function(savePath, saveName, tableName, saveFormat, thedata){
     stop("Output format has not been correctly specified.")
   }
 }
-
-unlistGUID <- function(thedata){
-  allnames <- names(thedata)
-  guidnames <- allnames[grep("_GUID", allnames)]
-  for(indiguidname in guidnames){
-    guids <- thedata[[indiguidname]]
-    thedata[, c(indiguidname):=NULL]
-   thedata[, c(indiguidname) := unlist(lapply(guids, function(s){paste0(unlist(s), collapse = "")}))]
-  rm(guids, indiguidname)
-  }
-  return(thedata)
-}
-

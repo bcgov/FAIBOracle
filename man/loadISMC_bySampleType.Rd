@@ -4,13 +4,17 @@
 \alias{loadISMC_bySampleType}
 \title{Load the data from ISMC Oracle database using sample type(s)}
 \usage{
-loadISMC_bySampleType(userName, passWord, sampleType, savePath = ".",
-  saveFormat = "rdata", overWrite = FALSE)
+loadISMC_bySampleType(userName, passWord, env, sampleType,
+  savePath = ".", saveFormat = "rdata", overWrite = FALSE)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}
 
 \item{passWord}{character, Specifies the password to the user name.}
+
+\item{env}{character, Specifies which environment the data reside. Currently,
+the function supports \code{INT} (intergration)
+and \code {TEST} (test) environment.}
 
 \item{sampleType}{character, Site type or types for BC ground sample inventory, such as \code{L}, \code{M} and \code{Y}.}
 
