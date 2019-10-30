@@ -4,13 +4,17 @@
 \alias{loadISMC_bySiteName}
 \title{Load the data from ISMC Oracle database using site name(s)}
 \usage{
-loadISMC_bySiteName(userName, passWord, siteName, savePath = ".",
+loadISMC_bySiteName(userName, passWord, env, siteName, savePath = ".",
   saveName, saveFormat = "rdata", overWrite = FALSE)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}
 
 \item{passWord}{character, Specifies the password to the user name.}
+
+\item{env}{character, Specifies which environment the data reside. Currently,
+the function supports \code{INT} (intergration)
+and \code {TEST} (test) environment.}
 
 \item{siteName}{character, Site name.}
 
