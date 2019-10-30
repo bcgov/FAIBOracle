@@ -4,12 +4,16 @@
 \alias{tablesInISMC}
 \title{Obtain all the table names (and column names) in ISMC}
 \usage{
-tablesInISMC(userName, passWord, columnNames = TRUE)
+tablesInISMC(userName, passWord, env, columnNames = TRUE)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}
 
 \item{passWord}{character, Specifies the password to the user name.}
+
+\item{env}{character, Specifies which environment the data reside. Currently,
+the function supports \code{INT} (intergration)
+and \code {TEST} (test) environment.}
 
 \item{columnNames}{logic, Obtain column names in each table. Default is TRUE.}
 }

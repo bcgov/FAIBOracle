@@ -4,6 +4,9 @@
 #'
 #' @param userName character, Specifies a valid user name in ISMC Oracle database.
 #' @param passWord character, Specifies the password to the user name.
+#' @param env character, Specifies which environment the data reside. Currently,
+#'                               the function supports \code{INT} (intergration)
+#'                               and \code {TEST} (test) environment.
 #' @param columnNames logic, Obtain column names in each table. Default is TRUE.
 #'
 #' @return a data table
@@ -17,11 +20,19 @@
 #' @seealso \code{\link{tablesInGYS}} and \code{\link{tablesInVGIS}}
 #' @rdname tablesInISMC
 #' @author Yong Luo
-tablesInISMC <- function(userName, passWord, columnNames = TRUE){
+tablesInISMC <- function(userName, passWord, env, columnNames = TRUE){
   drv <- dbDriver("Oracle")
-  connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
-(HOST = nrcdb01.bcgov)(PORT = 1521)))
-(CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+  if(env == "TEST"){
+    connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+    (HOST = nrcdb01.bcgov)(PORT = 1521)))
+    (CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+  } else if (env == "INT"){
+    connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
+    (HOST=nrcdb01.bcgov)(PORT=1521)))
+    (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
+  } else {
+    stop("env must be specified either INT or TEST.")
+  }
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
