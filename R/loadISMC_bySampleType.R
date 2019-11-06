@@ -92,6 +92,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
+
   SampleSites <-
     dbGetQuery(con,
                paste0("select
@@ -103,38 +104,33 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       plc.point_location_type_code,
                       plc.coordinate_source_code,
                       pspss.*,
-                      au.*,
-                      cpn.*,
-                      cpl.*,
-                      srg.*
+                      rcl.*
 
                       from
                       app_ismc.sample_site ss
 
-                      left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_guic = ss.sample_site_guic
-
                       left join app_ismc.point_location plc
-                      on ss.point_location_guic = plc.point_location_guic
+                      on plc.point_location_guic = ss.point_location_guic
 
                       left join app_ismc.psp_sample_site pspss
                       on pspss.sample_site_guic = ss.sample_site_guic
 
-                      left join app_ismc.areal_unit au
-                      on au.areal_unit_guic = pspss.areal_unit_guic
+                      -- rcl_mvw is materialized view
+                      left join app_ismc.ismc_rcl_mvw rcl
+                      on rcl.areal_unit_guic = pspss.areal_unit_guic
 
-                      left join app_ismc.compartment_letter cpl
-                      on cpl.compartment_letter_guic = au.compartment_letter_guic
+                      where exists (
+                      --
+                      -- revised based on John's comment
+                      --
+                      select 1
 
-                      left join app_ismc.compartment_number cpn
-                      on ((cpn.compartment_number_guic = au.compartment_number_guic) or (cpn.compartment_number_guic = cpl.compartment_number_guic))
+                      from app_ismc.sample_site_visit ssv
+                      where ssv.sample_site_guic = ss.sample_site_guic
 
-                      left join app_ismc.sampling_region srg
-                      on srg.sampling_region_guic = cpn.sampling_region_guic
-
-                      where
-                      ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      and ssv.sample_site_purpose_type_code in ", sampleType,
+                      ")
+                      order by
                       sample_site_name")) %>%
     data.table
 
@@ -163,12 +159,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = an.sample_site_guic
 
-                      left join app_ismc.sample_site_visit ssv
-                      on ssv.sample_site_guic = ss.sample_site_guic
+                      where exists (
+                      --
+                      -- revised based on John's comment
+                      --
+                      select 1
 
-                      where
-                      ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      from app_ismc.sample_site_visit ssv
+                      where ssv.sample_site_guic = ss.sample_site_guic
+
+                      and ssv.sample_site_purpose_type_code in ", sampleType,
+                      ")
+                      order by
                       sample_site_name, sequence_number")) %>%
     data.table
   AccessNotes <- cleanColumns(AccessNotes, level = "sample_site")

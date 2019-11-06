@@ -78,6 +78,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
+
   SampleSites <-
     dbGetQuery(con,
                paste0("select
@@ -87,13 +88,22 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       plc.utm_easting,
                       plc.elevation,
                       plc.point_location_type_code,
-                      plc.coordinate_source_code
+                      plc.coordinate_source_code,
+                      pspss.*,
+                      rcl.*
 
                       from
                       app_ismc.sample_site ss
 
                       left join app_ismc.point_location plc
-                      on ss.point_location_guic = plc.point_location_guic
+                      on plc.point_location_guic = ss.point_location_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      -- ismc_rcl_mvw is materialized view
+                      left join app_ismc.ismc_rcl_mvw rcl
+                      on rcl.areal_unit_guic = pspss.areal_unit_guic
 
                       where
                       ss.sample_site_name in ", siteName,
@@ -108,7 +118,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   norecordsample <- siteName_org[!(siteName_org %in% unique(SampleSites$SAMPLE_SITE_NAME))]
   if(length(norecordsample) != 0){
     warning(paste0("There is no record for the sample site(s): ",
-                paste0(norecordsample, collapse = ", ")))
+                   paste0(norecordsample, collapse = ", ")))
   }
   rm(siteName_org, norecordsample)
   SampleSites <- cleanColumns(SampleSites, level = "sample_site")
