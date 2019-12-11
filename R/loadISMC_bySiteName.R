@@ -64,17 +64,8 @@ loadISMC_bySiteName <- function(userName, passWord, env,
     siteName <- paste0("('", paste0(siteName, collapse = "', '"),"')")
   }
   drv <- dbDriver("Oracle")
-  if(env == "TEST"){
-    connect_to_ismc <- "(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
-    (HOST = nrcdb01.bcgov)(PORT = 1521)))
-    (CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
-  } else if (env == "INT"){
-    connect_to_ismc <- "(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)
-    (HOST=nrcdb01.bcgov)(PORT=1521)))
-    (CONNECT_DATA=(SERVICE_NAME=ismcint.nrs.bcgov)))"
-  } else {
-    stop("env must be specified either INT or TEST.")
-  }
+  connect_to_ismc <- getServer(databaseName = "ISMC",
+                                 envir = env)
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)

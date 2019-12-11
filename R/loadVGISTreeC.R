@@ -30,11 +30,9 @@
 loadVGISTreeC <- function(userName, passWord, saveThem = FALSE,
                                savePath = file.path(".")){
   drv <- dbDriver("Oracle")
-  connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrk1-scan.bcgov)(PORT=1521))
-  (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ENVPROD1.NRS.BCGOV)))"
+  connect_string <- getServer(databaseName = "VGIS")
   con <- dbConnect(drv, username = userName, password = passWord,
-                   dbname = connect.string)
+                   dbname = connect_string)
   c8tree <- dbGetQuery(con, "SELECT
                        vgis.vgis_projects.PROJECT_SKEY        AS PROJ_KEY,
                        vgis.vgis_projects.PROJECT_BUSINESS_ID      AS PROJ_ID,

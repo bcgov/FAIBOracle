@@ -22,12 +22,9 @@
 #' @author Yong Luo
 loadGYS <- function(userName, passWord, savePath = file.path(".")){
   drv <- dbDriver("Oracle")
-  connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrk1-scan.bcgov)(PORT=1521))
-  (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=DBP07.NRS.BCGOV)))"
+  connect_string <- getServer(databaseName = "GYS")
   con <- dbConnect(drv, username = userName, password = passWord,
-                   dbname = connect.string)
-
+                   dbname = connect_string)
   rcl_area_validn_codes <- dbGetQuery(con, "Select rcl_area_validn_skey ,
                                       inv_region_num  as region,
                                       compt_num as COMPT ,

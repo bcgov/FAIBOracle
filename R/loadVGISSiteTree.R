@@ -30,11 +30,9 @@
 loadVGISSiteTree <- function(userName, passWord, saveThem = FALSE,
                              savePath = file.path(".")){
   drv <- dbDriver("Oracle")
-  connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrk1-scan.bcgov)(PORT=1521))
-  (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ENVPROD1.NRS.BCGOV)))"
+  connect_string <- getServer(databaseName = "VGIS")
   con <- dbConnect(drv, username = userName, password = passWord,
-                   dbname = connect.string)
+                   dbname = connect_string)
   c10tree <- dbGetQuery(con, "SELECT ALL
                         vgis.vgis_projects.PROJECT_BUSINESS_ID                    as proj_id,
                         vgis.PLOT_CLUSTERS.SAMPLE_EXP_PLOT_NUM               as samp_no,

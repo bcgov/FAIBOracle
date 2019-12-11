@@ -19,11 +19,9 @@
 #' @author Yong Luo
 tablesInGYS <- function(userName, passWord, columnNames = TRUE){
   drv <- dbDriver("Oracle")
-  connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrk1-scan.bcgov)(PORT=1521))
-  (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=DBP07.NRS.BCGOV)))"
+  connect_string <- getServer(databaseName = "GYS")
   con <- dbConnect(drv, username = userName, password = passWord,
-                   dbname = connect.string)
+                   dbname = connect_string)
   alltables <- ROracle::dbListTables(con, all = TRUE, full = TRUE)
   alltables <- data.table::data.table(matrix(alltables, ncol = 2))
   names(alltables) <- c("DataBase", "TableName")

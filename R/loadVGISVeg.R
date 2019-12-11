@@ -30,11 +30,9 @@
 loadVGISVeg <- function(userName, passWord, saveThem = FALSE,
                         savePath = file.path(".")){
   drv <- dbDriver("Oracle")
-  connect.string <-"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)
-  (HOST=nrk1-scan.bcgov)(PORT=1521))
-  (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ENVPROD1.NRS.BCGOV)))"
+  connect_string <- getServer(databaseName = "VGIS")
   con <- dbConnect(drv, username = userName, password = passWord,
-                   dbname = connect.string)
+                   dbname = connect_string)
   c14veg <- dbGetQuery(con, "SELECT
                        vgis.PLOT_CLUSTERS.PLOT_CLUSTER_SKEY                      AS CL_KEY,
                        vgis.vgis_projects.PROJECT_SKEY                                AS PROJ_KEY,
