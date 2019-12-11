@@ -1,12 +1,10 @@
 
 rmarkdown::render("README.rmd", output_format = "md_document")
 devtools::document()
-devtools::check(document = TRUE, args = "--no-multiarch")
-devtools::check(args = "--no-multiarch")
 system("R CMD Rd2pdf --force --output=./vignettes/Manual.pdf ." )
+devtools::install(args = "--no-multiarch")
+devtools::check(document = TRUE, args = "--no-multiarch")
 devtools::build(args = "--no-multiarch")
-
-
 
 
 install.packages("C:/F/GitHub/FAIBOracle_0.0.0.9000.tar.gz",
