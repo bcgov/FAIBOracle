@@ -102,7 +102,7 @@ loadISMC_all <- function(userName, passWord, env,
   PointLocation  <-
     dbGetQuery(con,
                "select
-               plc.point_location_guid,
+               plc.point_location_guic,
                plc.bcgs_mapsheet_number,
                plc.coordinate_source_code,
                plc.elevation,
