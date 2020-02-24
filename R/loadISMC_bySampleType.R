@@ -47,11 +47,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
   } else {
     thetime <- paste0(thetime, "pm")
   }
-  saveName <- paste0("ISMC_", substr(as.character(Sys.time()), 1, 10), thetime,
-                     "(", paste0(sampleType, collapse = "_"), ")")
+  saveName <- paste0("ISMC_", env, "_", substr(as.character(Sys.time()), 1, 10), "_", thetime)
   saveName <- gsub("-", "", saveName)
-
-
 
   if(overWrite & file.exists(file.path(savePath, paste0(saveName, ".", saveFormat)))){
     file.remove(file.path(savePath, paste0(saveName, ".", saveFormat)))
