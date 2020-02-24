@@ -49,7 +49,6 @@ loadISMC_bySiteName <- function(userName, passWord, env,
     file.remove(file.path(savePath, paste0(saveName, ".", saveFormat)))
     warning("The original file has been overwritten.")
   }
-
   if(!overWrite & file.exists(file.path(savePath, paste0(saveName, ".", saveFormat)))){
     cat("Please use different file name, as it is in use. Or turn on overWrite arguement to overwrite the current file.")
     thisopt <- options(show.error.messages = FALSE)
@@ -97,8 +96,8 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on rcl.areal_unit_guic = pspss.areal_unit_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
-                      "order by sample_site_name")) %>%
+                      ss.site_identifier in ", siteName,
+                      "order by site_identifier")) %>%
     data.table
 
   if(nrow(SampleSites) == 0){
@@ -106,7 +105,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                 paste0(siteName_org, collapse = ", ")))
   }
 
-  norecordsample <- siteName_org[!(siteName_org %in% unique(SampleSites$SAMPLE_SITE_NAME))]
+  norecordsample <- siteName_org[!(siteName_org %in% unique(SampleSites$SITE_IDENTIFIER))]
   if(length(norecordsample) != 0){
     warning(paste0("There is no record for the sample site(s): ",
                    paste0(norecordsample, collapse = ", ")))
@@ -118,7 +117,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   AccessNotes <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       an.*
 
                       from
@@ -128,8 +127,8 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on ss.sample_site_guic = an.sample_site_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
-                      "order by sample_site_name, sequence_number")) %>%
+                      ss.site_identifier in ", siteName,
+                      "order by site_identifier, sequence_number")) %>%
     data.table
   AccessNotes <- cleanColumns(AccessNotes, level = "sample_site")
   AccessNotes <- unique(AccessNotes)
@@ -137,7 +136,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   SampleSiteVisits <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.*,
                       ssv.*
 
@@ -151,8 +150,8 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
-                      "order by sample_site_name, visit_number, project_name,
+                      ss.site_identifier in ", siteName,
+                      "order by site_identifier, visit_number, project_name,
                       sample_site_purpose_type_code")) %>%
     data.table
   SampleSiteVisits <- cleanColumns(SampleSiteVisits, level = "site_visit")
@@ -160,7 +159,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   GroundSampleCrewActivities <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -188,16 +187,16 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on cc.ground_sample_human_rsrce_guic = gsca.ground_sample_human_rsrce_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, project_name")) %>%
+                      site_identifier, visit_number, project_name")) %>%
     data.table
   GroundSampleCrewActivities <- cleanColumns(GroundSampleCrewActivities, level = "site_visit")
 
   PlotDetails <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -221,16 +220,16 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, project_name, plot_category_code, plot_number")) %>%
+                      site_identifier, visit_number, project_name, plot_category_code, plot_number")) %>%
     data.table
   PlotDetails <- cleanColumns(PlotDetails, level = "site_visit")
 
   SampleMeasurements <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -250,16 +249,16 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on ss.sample_site_guic = ssv.sample_site_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, project_name")) %>%
+                      site_identifier, visit_number, project_name")) %>%
     data.table
   SampleMeasurements <- cleanColumns(SampleMeasurements, level = "site_visit")
 
   SmallLiveTreeTallies <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       pt.plot_category_code,
                       pt.plot_number,
                       ssv.visit_number,
@@ -288,9 +287,9 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on pt.plot_guic = sm.plot_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, plot_number, visit_number, tree_species_code, small_tree_tally_class_code")) %>%
+                      site_identifier, plot_number, visit_number, tree_species_code, small_tree_tally_class_code")) %>%
     data.table
   SmallLiveTreeTallies <- cleanColumns(SmallLiveTreeTallies, level = "site_visit")
 
@@ -300,7 +299,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   TreeMeasurements <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -342,15 +341,15 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, plot_category_code, plot_number, tree_number")) %>%
+                      site_identifier, visit_number, plot_category_code, plot_number, tree_number")) %>%
     data.table
   TreeMeasurements <- cleanColumns(TreeMeasurements, level = "tree")
   TreeDamageOccurrences <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -396,9 +395,9 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       and td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, plot_category_code,
+                      site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, sequence_number")) %>%
     data.table
   TreeDamageOccurrences <- cleanColumns(TreeDamageOccurrences, level = "tree")
@@ -406,7 +405,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   TreeLossIndicators <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -449,9 +448,9 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, plot_category_code,
+                      site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, location_from, location_to")) %>%
     data.table
   TreeLossIndicators <- cleanColumns(TreeLossIndicators, level = "tree")
@@ -459,7 +458,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   TreeLogAssessments <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -504,9 +503,9 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number, plot_category_code,
+                      site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, log_number")) %>%
     data.table
   TreeLogAssessments <- cleanColumns(TreeLogAssessments, level = "tree")
@@ -515,7 +514,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   StumpTallies <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -541,16 +540,16 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number")) %>%
+                      site_identifier, visit_number")) %>%
     data.table
   StumpTallies <- cleanColumns(StumpTallies, level = "site_visit")
 
   SiteNavigation <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -569,16 +568,16 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number")) %>%
+                      site_identifier, visit_number")) %>%
     data.table
   SiteNavigation <- cleanColumns(SiteNavigation, level = "site_visit")
 
   IntegratedPlotCenter <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -608,9 +607,9 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number")) %>%
+                      site_identifier, visit_number")) %>%
     data.table
   IntegratedPlotCenter <- cleanColumns(IntegratedPlotCenter, level = "site_visit")
 
@@ -618,7 +617,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
   ReferencePoint <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -645,16 +644,16 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number")) %>%
+                      site_identifier, visit_number")) %>%
     data.table
   ReferencePoint <- cleanColumns(ReferencePoint, level = "site_visit")
 
   TiePoint <-
     dbGetQuery(con,
                paste0("select
-                      ss.sample_site_name,
+                      ss.site_identifier,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
@@ -689,9 +688,9 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.sample_site_name in ", siteName,
+                      ss.site_identifier in ", siteName,
                       "order by
-                      sample_site_name, visit_number")) %>%
+                      site_identifier, visit_number")) %>%
     data.table
   TiePoint <- cleanColumns(TiePoint, level = "site_visit")
   dbDisconnect(con)
