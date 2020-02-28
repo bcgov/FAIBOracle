@@ -92,7 +92,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       plc.point_location_type_code,
                       plc.coordinate_source_code,
                       pspss.*,
-                      rcl.*
+                      rcl.*,
+                      ssn.*
 
                       from
                       app_ismc.sample_site ss
@@ -102,6 +103,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       left join app_ismc.psp_sample_site pspss
                       on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.conv_sample_site_name ssn
+                      on ssn.sample_site_guic = ss.sample_site_guic
 
                       -- rcl_mvw is materialized view
                       left join app_ismc.ismc_rcl_mvw rcl
