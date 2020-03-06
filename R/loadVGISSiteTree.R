@@ -20,7 +20,7 @@
 #'         \item{\code{}}
 #'         }
 #'
-#' @importFrom data.table ':=' data.table
+#' @importFrom data.table ':=' data.table dcast
 #' @importFrom dplyr '%>%'
 #' @importFrom ROracle dbConnect dbGetQuery dbDisconnect
 #' @importFrom DBI dbDriver
@@ -139,56 +139,83 @@ loadVGISSiteTree <- function(userName, passWord, saveThem = FALSE,
                                 CR_CL = CR_CLSS)],
                      by = c("CLSTR_ID", "PLOT", "TREE_NO"))
   totaltreenum <- nrow(alltrees)
-  yr_cnt <- c10tree[,.(CLSTR_ID, PLOT, TREE_NO,
-                       comp_meth = paste(COMPTYPE, "-", AS_METH, sep = ""),
-                       AGE_METH, YR_CNT, CORELEN)]
-  yr_cnt_wide <- yr_cnt[comp_meth != "RING-OCC" &  AGE_METH != "RANDOM",
-                        .(CLSTR_ID, PLOT, TREE_NO, YR_CNT, comp_meth)]
-  yr_cnt_wide <- yr_cnt_wide[!duplicated(yr_cnt_wide)]
-  yr_cnt_wide <- reshape(data = yr_cnt_wide,
-                         v.names = "YR_CNT",
-                         timevar = "comp_meth",
-                         idvar = c("CLSTR_ID", "PLOT", "TREE_NO"),
-                         direction = "wide")
-  setnames(yr_cnt_wide, paste("YR_CNT.",
-                              c("RING-OFCOCC", "RING-FLDOCC", "REPRC-OCC",
-                                "ADJ2GP-CALC", "TOTAL-CALC", "PHYSAGE-PRORATE"),
-                              sep = ""),
-           c("BORE_AGE", "BORAG_FL", "PRO_RING",
-             "AGE_CORR", "TOTAL_AG", "PHYS_AGE"))
-  alltrees <- merge(alltrees, yr_cnt_wide,
-                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
-                    all.x = TRUE)
-  rm(yr_cnt_wide)
 
-  growth <- yr_cnt[comp_meth == "RING-OCC" & AGE_METH != "RANDOM",
-                   .(CLSTR_ID, PLOT, TREE_NO, YR_CNT, CORELEN)]
-  growth <- growth[!duplicated(growth),]
-  growth_wide <- reshape(data = growth,
-                         v.names = "CORELEN",
-                         timevar = "YR_CNT",
-                         idvar = c("CLSTR_ID", "PLOT", "TREE_NO"),
-                         direction = "wide")
-  setnames(growth_wide, paste("CORELEN.", c(5, 10, 20), sep = ""),
-           paste("GROW_", c(5, 10, 20), "YR", sep = ""))
-  alltrees <- merge(alltrees, growth_wide,
-                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
-                    all.x = TRUE)
-  rm(growth_wide, growth)
 
-  pro_len <- yr_cnt[comp_meth == "REPRC-OCC" & AGE_METH != "RANDOM",
-                    .(CLSTR_ID, PLOT, TREE_NO, PRO_LEN = CORELEN)]
-  pro_len <- pro_len[!duplicated(pro_len),]
-  alltrees <- merge(alltrees, pro_len,
+
+  yr_cnt <- data.table::copy(c10tree)
+  yr_cnt[, comp_meth := paste0(COMPTYPE, "-", AS_METH)]
+  boreage_table <- unique(yr_cnt[comp_meth == "RING-OFCOCC",
+                          .(CLSTR_ID, PLOT, TREE_NO,
+                             BORE_AGE = YR_CNT)],
+                          by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+  alltrees <- merge(alltrees, boreage_table,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
-  rm(pro_len, yr_cnt)
+
+  borag_fl_table <- unique(yr_cnt[comp_meth == "RING-FLDOCC",
+                          .(CLSTR_ID, PLOT, TREE_NO,
+                            BORAG_FL = YR_CNT)],
+                          by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+
+  alltrees <- merge(alltrees, borag_fl_table,
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
+                    all.x = TRUE)
+  ## there are duplicates for each
+  ## disk
+  growth_table <- unique(yr_cnt[comp_meth == "RING-OCC",
+                          .(CLSTR_ID, PLOT, TREE_NO,
+                            YR_CNT, CORELEN)])
+
+  growth_table <- dcast(data = growth_table,
+                        CLSTR_ID + PLOT + TREE_NO ~ YR_CNT,
+                        fun.aggregate = min,
+                        value.var = "CORELEN")
+
+  setnames(growth_table, c("5", "10", "20"),
+           c("GROW_5YR", "GROW_10Y", "GROW_20Y"))
+
+  growth_table[GROW_5YR == Inf, GROW_5YR := NA]
+  growth_table[GROW_10Y == Inf, GROW_10Y := NA]
+  growth_table[GROW_20Y == Inf, GROW_20Y := NA]
+  alltrees <- merge(alltrees, growth_table,
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
+                    all.x = TRUE)
+  prorate <- unique(yr_cnt[comp_meth == "REPRC-OCC",
+                    .(CLSTR_ID, PLOT, TREE_NO,
+                      PRO_RING = YR_CNT,
+                      PRO_LEN = CORELEN)],
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+  alltrees <- merge(alltrees, prorate,
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
+                    all.x = TRUE)
+  age_corr <- unique(yr_cnt[comp_meth == "ADJ2GP-CALC",
+                           .(CLSTR_ID, PLOT, TREE_NO,
+                             AGE_CORR = YR_CNT)],
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+  alltrees <- merge(alltrees, age_corr,
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
+                    all.x = TRUE)
+  totalage <- unique(yr_cnt[comp_meth == "TOTAL-CALC",
+                           .(CLSTR_ID, PLOT, TREE_NO,
+                             TOTAL_AG = YR_CNT)],
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+  alltrees <- merge(alltrees, totalage,
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
+                    all.x = TRUE)
+  physage <- unique(yr_cnt[comp_meth == "PHYSAGE-PRORATE",
+                           .(CLSTR_ID, PLOT, TREE_NO,
+                             PHYS_AGE = YR_CNT)],
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+  alltrees <- merge(alltrees, physage,
+                    by = c("CLSTR_ID", "PLOT", "TREE_NO"),
+                    all.x = TRUE)
+
   alltrees[CR_CL == "1", CR_CL := "D"]
   alltrees[CR_CL == "2", CR_CL := "C"]
   alltrees[CR_CL == "3", CR_CL := "I"]
   alltrees[CR_CL == "4", CR_CL := "S"]
-  treeheight <- c10tree[HT_POS == "TOP",.(CLSTR_ID, PLOT, TREE_NO, TREE_LEN = HEIGHT)]
-  treeheight <- treeheight[!duplicated(treeheight),]
+  treeheight <- unique(c10tree[HT_POS == "TOP",.(CLSTR_ID, PLOT, TREE_NO, TREE_LEN = HEIGHT)],
+                       by = c("CLSTR_ID", "PLOT", "TREE_NO"))
   alltrees <- merge(alltrees, treeheight,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
