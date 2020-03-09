@@ -145,17 +145,17 @@ loadVGISSiteTree <- function(userName, passWord, saveThem = FALSE,
   yr_cnt <- data.table::copy(c10tree)
   yr_cnt[, comp_meth := paste0(COMPTYPE, "-", AS_METH)]
   boreage_table <- unique(yr_cnt[comp_meth == "RING-OFCOCC",
-                          .(CLSTR_ID, PLOT, TREE_NO,
-                             BORE_AGE = YR_CNT)],
+                                 .(CLSTR_ID, PLOT, TREE_NO,
+                                   BORE_AGE = YR_CNT)],
                           by = c("CLSTR_ID", "PLOT", "TREE_NO"))
   alltrees <- merge(alltrees, boreage_table,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
 
   borag_fl_table <- unique(yr_cnt[comp_meth == "RING-FLDOCC",
-                          .(CLSTR_ID, PLOT, TREE_NO,
-                            BORAG_FL = YR_CNT)],
-                          by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+                                  .(CLSTR_ID, PLOT, TREE_NO,
+                                    BORAG_FL = YR_CNT)],
+                           by = c("CLSTR_ID", "PLOT", "TREE_NO"))
 
   alltrees <- merge(alltrees, borag_fl_table,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
@@ -163,13 +163,13 @@ loadVGISSiteTree <- function(userName, passWord, saveThem = FALSE,
   ## there are duplicates for each
   ## disk
   growth_table <- unique(yr_cnt[comp_meth == "RING-OCC",
-                          .(CLSTR_ID, PLOT, TREE_NO,
-                            YR_CNT, CORELEN)])
+                                .(CLSTR_ID, PLOT, TREE_NO,
+                                  YR_CNT, CORELEN)])
 
-  growth_table <- dcast(data = growth_table,
-                        CLSTR_ID + PLOT + TREE_NO ~ YR_CNT,
-                        fun.aggregate = min,
-                        value.var = "CORELEN")
+  growth_table <- data.table::dcast(data = growth_table,
+                                    CLSTR_ID + PLOT + TREE_NO ~ YR_CNT,
+                                    fun.aggregate = min,
+                                    value.var = "CORELEN")
 
   setnames(growth_table, c("5", "10", "20"),
            c("GROW_5YR", "GROW_10Y", "GROW_20Y"))
@@ -181,24 +181,24 @@ loadVGISSiteTree <- function(userName, passWord, saveThem = FALSE,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
   prorate <- unique(yr_cnt[comp_meth == "REPRC-OCC",
-                    .(CLSTR_ID, PLOT, TREE_NO,
-                      PRO_RING = YR_CNT,
-                      PRO_LEN = CORELEN)],
+                           .(CLSTR_ID, PLOT, TREE_NO,
+                             PRO_RING = YR_CNT,
+                             PRO_LEN = CORELEN)],
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"))
   alltrees <- merge(alltrees, prorate,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
   age_corr <- unique(yr_cnt[comp_meth == "ADJ2GP-CALC",
-                           .(CLSTR_ID, PLOT, TREE_NO,
-                             AGE_CORR = YR_CNT)],
-                    by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+                            .(CLSTR_ID, PLOT, TREE_NO,
+                              AGE_CORR = YR_CNT)],
+                     by = c("CLSTR_ID", "PLOT", "TREE_NO"))
   alltrees <- merge(alltrees, age_corr,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
   totalage <- unique(yr_cnt[comp_meth == "TOTAL-CALC",
-                           .(CLSTR_ID, PLOT, TREE_NO,
-                             TOTAL_AG = YR_CNT)],
-                    by = c("CLSTR_ID", "PLOT", "TREE_NO"))
+                            .(CLSTR_ID, PLOT, TREE_NO,
+                              TOTAL_AG = YR_CNT)],
+                     by = c("CLSTR_ID", "PLOT", "TREE_NO"))
   alltrees <- merge(alltrees, totalage,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
