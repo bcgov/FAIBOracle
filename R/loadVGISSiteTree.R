@@ -172,11 +172,11 @@ loadVGISSiteTree <- function(userName, passWord, saveThem = FALSE,
                                     value.var = "CORELEN")
 
   setnames(growth_table, c("5", "10", "20"),
-           c("GROW_5YR", "GROW_10Y", "GROW_20Y"))
+           c("GROW_5YR", "GROW_10YR", "GROW_20YR"))
 
   growth_table[GROW_5YR == Inf, GROW_5YR := NA]
-  growth_table[GROW_10Y == Inf, GROW_10Y := NA]
-  growth_table[GROW_20Y == Inf, GROW_20Y := NA]
+  growth_table[GROW_10YR == Inf, GROW_10YR := NA]
+  growth_table[GROW_20YR == Inf, GROW_20YR := NA]
   alltrees <- merge(alltrees, growth_table,
                     by = c("CLSTR_ID", "PLOT", "TREE_NO"),
                     all.x = TRUE)
