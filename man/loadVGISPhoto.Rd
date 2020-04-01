@@ -4,8 +4,7 @@
 \alias{loadVGISPhoto}
 \title{Load the photo data from Oracle database}
 \usage{
-loadVGISPhoto(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISPhoto(userName, passWord, saveThem = FALSE, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

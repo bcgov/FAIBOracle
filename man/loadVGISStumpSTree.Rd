@@ -4,8 +4,12 @@
 \alias{loadVGISStumpSTree}
 \title{Load the stump and small tree data from Oracle database}
 \usage{
-loadVGISStumpSTree(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISStumpSTree(
+  userName,
+  passWord,
+  saveThem = FALSE,
+  savePath = file.path(".")
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

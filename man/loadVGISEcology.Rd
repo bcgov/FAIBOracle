@@ -4,8 +4,12 @@
 \alias{loadVGISEcology}
 \title{Load the ecological data from Oracle database}
 \usage{
-loadVGISEcology(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISEcology(
+  userName,
+  passWord,
+  saveThem = FALSE,
+  savePath = file.path(".")
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

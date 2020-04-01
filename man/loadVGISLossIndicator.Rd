@@ -4,8 +4,12 @@
 \alias{loadVGISLossIndicator}
 \title{Load the loss indicator data from Oracle database}
 \usage{
-loadVGISLossIndicator(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISLossIndicator(
+  userName,
+  passWord,
+  saveThem = FALSE,
+  savePath = file.path(".")
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

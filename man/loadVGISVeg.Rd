@@ -4,8 +4,7 @@
 \alias{loadVGISVeg}
 \title{Load the veg data from Oracle database}
 \usage{
-loadVGISVeg(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISVeg(userName, passWord, saveThem = FALSE, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

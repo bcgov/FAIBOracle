@@ -4,8 +4,12 @@
 \alias{loadVGISSuccession}
 \title{Load the card 16 succession interpretations (eo) data from Oracle database}
 \usage{
-loadVGISSuccession(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISSuccession(
+  userName,
+  passWord,
+  saveThem = FALSE,
+  savePath = file.path(".")
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

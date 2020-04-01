@@ -4,8 +4,16 @@
 \alias{loadISMC_bySiteName}
 \title{Load the data from ISMC Oracle database using site name(s)}
 \usage{
-loadISMC_bySiteName(userName, passWord, env, siteName, savePath = ".",
-  saveName, saveFormat = "rdata", overWrite = FALSE)
+loadISMC_bySiteName(
+  userName,
+  passWord,
+  env,
+  siteName,
+  savePath = ".",
+  saveName,
+  saveFormat = "rdata",
+  overWrite = FALSE
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}

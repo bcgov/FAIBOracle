@@ -4,8 +4,12 @@
 \alias{loadVGISSiteTree}
 \title{Load the site/stump/small tree (3s) data from Oracle database}
 \usage{
-loadVGISSiteTree(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISSiteTree(
+  userName,
+  passWord,
+  saveThem = FALSE,
+  savePath = file.path(".")
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

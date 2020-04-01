@@ -4,8 +4,7 @@
 \alias{loadVGISTreeC}
 \title{Load the full/enhanced/H-enhanced tree data from Oracle database}
 \usage{
-loadVGISTreeC(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISTreeC(userName, passWord, saveThem = FALSE, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

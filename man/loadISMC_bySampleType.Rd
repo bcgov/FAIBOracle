@@ -4,8 +4,15 @@
 \alias{loadISMC_bySampleType}
 \title{Load the data from ISMC Oracle database using sample type(s)}
 \usage{
-loadISMC_bySampleType(userName, passWord, env, sampleType,
-  savePath = ".", saveFormat = "rdata", overWrite = FALSE)
+loadISMC_bySampleType(
+  userName,
+  passWord,
+  env,
+  sampleType,
+  savePath = ".",
+  saveFormat = "rdata",
+  overWrite = FALSE
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}

@@ -4,8 +4,14 @@
 \alias{loadISMC_all}
 \title{Load all key data from ISMC Oracle database}
 \usage{
-loadISMC_all(userName, passWord, env, savePath = ".",
-  saveFormat = "rds", overWrite = FALSE)
+loadISMC_all(
+  userName,
+  passWord,
+  env,
+  savePath = ".",
+  saveFormat = "rds",
+  overWrite = FALSE
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in ISMC Oracle database.}

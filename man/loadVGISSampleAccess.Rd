@@ -4,8 +4,12 @@
 \alias{loadVGISSampleAccess}
 \title{Load the sample access data from Oracle database}
 \usage{
-loadVGISSampleAccess(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISSampleAccess(
+  userName,
+  passWord,
+  saveThem = FALSE,
+  savePath = file.path(".")
+)
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

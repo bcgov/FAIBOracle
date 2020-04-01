@@ -4,8 +4,7 @@
 \alias{loadVGISPlot}
 \title{Load the plot header data from Oracle database}
 \usage{
-loadVGISPlot(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISPlot(userName, passWord, saveThem = FALSE, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

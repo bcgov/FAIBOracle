@@ -4,8 +4,7 @@
 \alias{loadVGISSample}
 \title{Load the sample header data from Oracle database}
 \usage{
-loadVGISSample(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISSample(userName, passWord, saveThem = FALSE, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}

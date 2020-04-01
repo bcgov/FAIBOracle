@@ -4,8 +4,7 @@
 \alias{loadVGISCWD}
 \title{Load the CWD data from Oracle database}
 \usage{
-loadVGISCWD(userName, passWord, saveThem = FALSE,
-  savePath = file.path("."))
+loadVGISCWD(userName, passWord, saveThem = FALSE, savePath = file.path("."))
 }
 \arguments{
 \item{userName}{character, Specifies a valid user name in VGIS Oracle database.}
