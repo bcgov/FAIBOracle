@@ -201,7 +201,9 @@ loadVGISLossIndicator <- function(userName, passWord, saveThem = FALSE,
                        vgis.CLUSTER_ELEMENTS.PLOT_IDENTIFIER ASC,
                        vgis.TREES.TREE_NUM ASC") %>%
     data.table
+  c9damg <- unique(c9damg, by = "DAMG_KEY")
   set(c9damg, , c("CL_KEY", "PROJ_KEY", "DAMG_KEY"), NULL)
+
   c9damg[,':='(CLSTR_ID = getClusterID(PROJ_ID, SAMP_NO, TYPE_,
                                        INTENT, VISIT),
                PLOT = getPlotCode(PLOT_ID),
