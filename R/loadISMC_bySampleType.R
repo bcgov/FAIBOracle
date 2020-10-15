@@ -80,7 +80,6 @@ loadISMC_bySampleType <- function(userName, passWord, env,
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
-
   SampleSites <-
     dbGetQuery(con,
                paste0("select
@@ -122,6 +121,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       and ssv.sample_site_purpose_type_code in ", sampleType,
                       ")
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
                       order by
                       site_identifier")) %>%
     data.table
@@ -151,6 +152,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = an.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       where exists (
                       --
                       -- revised based on John's comment
@@ -162,6 +166,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       and ssv.sample_site_purpose_type_code in ", sampleType,
                       ")
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
                       order by
                       site_identifier, sequence_number")) %>%
     data.table
@@ -173,7 +179,6 @@ loadISMC_bySampleType <- function(userName, passWord, env,
             thedata = AccessNotes)
   rm(AccessNotes)
   gc()
-
 
   SampleSiteVisits <-
     dbGetQuery(con,
@@ -188,21 +193,27 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, project_name, sample_site_purpose_type_code")) %>%
     data.table
   SampleSiteVisits <- cleanColumns(SampleSiteVisits, level = "site_visit")
+  allyears <- unique(year(SampleSiteVisits$SAMPLE_SITE_VISIT_START_DATE))
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SampleSiteVisits", saveFormat = saveFormat,
             thedata = SampleSiteVisits)
   rm(SampleSiteVisits)
   gc()
-
 
 
   GroundSampleCrewActivities <-
@@ -229,6 +240,10 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+                      and pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+
                       left join app_ismc.ground_sample_human_rsrce gshr
                       on gshr.ground_sample_human_rsrce_guic = gsca.ground_sample_human_rsrce_guic
 
@@ -237,7 +252,10 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, project_name")) %>%
     data.table
   GroundSampleCrewActivities <- cleanColumns(GroundSampleCrewActivities, level = "site_visit")
@@ -271,12 +289,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, project_name, plot_category_code, plot_number")) %>%
     data.table
   PlotDetails <- cleanColumns(PlotDetails, level = "site_visit")
@@ -313,9 +337,16 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, project_name")) %>%
     data.table
   SampleMeasurements <- cleanColumns(SampleMeasurements, level = "site_visit")
@@ -351,6 +382,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
@@ -359,7 +393,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, plot_number, tree_species_code, small_tree_tally_class_code")) %>%
     data.table
   SmallLiveTreeTallies <- cleanColumns(SmallLiveTreeTallies, level = "site_visit")
@@ -368,10 +404,13 @@ loadISMC_bySampleType <- function(userName, passWord, env,
             thedata = SmallLiveTreeTallies)
   rm(SmallLiveTreeTallies)
   gc()
-
-  TreeMeasurements <-
-    dbGetQuery(con,
-               paste0("select
+  if("PSP" %in% sampleType_org){
+    year_max <- max(allyears, na.rm = TRUE)
+    for (indiyear in c(2000, year_max)) {
+      if(indiyear == 2000){
+        TreeMeasurements <-
+          dbGetQuery(con,
+                     paste0("select
                       ss.site_identifier,
                       ssv.visit_number,
                       pt.plot_category_code,
@@ -406,46 +445,185 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
-                      site_identifier, visit_number, plot_category_code, plot_number, tree_number"))
-  gc()
-  chunckNum <- as.integer(nrow(TreeMeasurements)/1000000)
+                      "and extract(year from ssv.sample_site_visit_start_date) <= 2000
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
+      } else {
+        TreeMeasurements <-
+          dbGetQuery(con,
+                     paste0("select
+                      ss.site_identifier,
+                      ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      tr.*,
+                      td.*,
+                      tm.*,
+                      vtm.*
 
-  for(i in 0:chunckNum){
-    if(i != chunckNum){
-      tm_chuncked <- TreeMeasurements[((1000000*i+1) : (1000000*(i+1))),]
-      tm_chuncked <- data.table(tm_chuncked)
-      tm_chuncked <- cleanColumns(tm_chuncked, level = "tree")
+                      from
+                      app_ismc.tree_measurement tm
+
+                      left join app_ismc.tree tr
+                      on tr.tree_guic = tm.tree_guic
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guic = tr.plot_guic
+
+                      left join app_ismc.vri_tree_measurement vtm
+                      on vtm.tree_measurement_guic = tm.tree_measurement_guic
+
+                      left join app_ismc.sample_measurement sm
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
+
+                      left join app_ismc.sample_site_visit ssv
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.tree_detail td
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.sample_site ss
+                      on ss.sample_site_guic = ssv.sample_site_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.ground_sample_project gsp
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      where
+                      ssv.sample_site_purpose_type_code in ", sampleType,
+                      "and extract(year from ssv.sample_site_visit_start_date) > 2000
+                      and extract(year from ssv.sample_site_visit_start_date) <= ", indiyear,
+                      "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
+      }
       gc()
-    } else {
-      tm_chuncked <- TreeMeasurements[((1000000*i+1) : nrow(TreeMeasurements)),]
-      tm_chuncked <- data.table(tm_chuncked)
-      tm_chuncked <- cleanColumns(tm_chuncked, level = "tree")
+      chunckNum <- as.integer(nrow(TreeMeasurements)/1000000)
+
+      for(i in 0:chunckNum){
+        if(i != chunckNum){
+          tm_chuncked <- TreeMeasurements[((1000000*i+1) : (1000000*(i+1))),]
+          tm_chuncked <- data.table(tm_chuncked)
+          tm_chuncked <- cleanColumns(tm_chuncked, level = "tree")
+          gc()
+        } else {
+          tm_chuncked <- TreeMeasurements[((1000000*i+1) : nrow(TreeMeasurements)),]
+          tm_chuncked <- data.table(tm_chuncked)
+          tm_chuncked <- cleanColumns(tm_chuncked, level = "tree")
+          gc()
+        }
+        if(i == 0){
+          newtreedata <- data.table::copy(tm_chuncked)
+          rm(tm_chuncked)
+          gc()
+        } else {
+          newtreedata <- data.table::rbindlist(list(newtreedata, tm_chuncked))
+          rm(tm_chuncked)
+          gc()
+        }
+      }
+      rm(TreeMeasurements)
+      gc()
+      writeISMC(savePath = savePath, saveName = saveName,
+                tableName = paste0("TreeMeasurements_to", indiyear),
+                saveFormat = saveFormat,
+                thedata = newtreedata)
+      rm(newtreedata)
       gc()
     }
+  } else {
+    TreeMeasurements <-
+      dbGetQuery(con,
+                 paste0("select
+                      ss.site_identifier,
+                      ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      tr.*,
+                      td.*,
+                      tm.*,
+                      vtm.*
 
-    if(i == 0){
-      newtreedata <- data.table::copy(tm_chuncked)
-      rm(tm_chuncked)
-      gc()
-    } else {
-      newtreedata <- data.table::rbindlist(list(newtreedata, tm_chuncked))
-      rm(tm_chuncked)
-      gc()
+                      from
+                      app_ismc.tree_measurement tm
+
+                      left join app_ismc.tree tr
+                      on tr.tree_guic = tm.tree_guic
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guic = tr.plot_guic
+
+                      left join app_ismc.vri_tree_measurement vtm
+                      on vtm.tree_measurement_guic = tm.tree_measurement_guic
+
+                      left join app_ismc.sample_measurement sm
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
+
+                      left join app_ismc.sample_site_visit ssv
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.tree_detail td
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.sample_site ss
+                      on ss.sample_site_guic = ssv.sample_site_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.ground_sample_project gsp
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      where
+                      ssv.sample_site_purpose_type_code in ", sampleType,
+                      "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
+    gc()
+    chunckNum <- as.integer(nrow(TreeMeasurements)/1000000)
+
+    for(i in 0:chunckNum){
+      if(i != chunckNum){
+        tm_chuncked <- TreeMeasurements[((1000000*i+1) : (1000000*(i+1))),]
+        tm_chuncked <- data.table(tm_chuncked)
+        tm_chuncked <- cleanColumns(tm_chuncked, level = "tree")
+        gc()
+      } else {
+        tm_chuncked <- TreeMeasurements[((1000000*i+1) : nrow(TreeMeasurements)),]
+        tm_chuncked <- data.table(tm_chuncked)
+        tm_chuncked <- cleanColumns(tm_chuncked, level = "tree")
+        gc()
+      }
+
+      if(i == 0){
+        newtreedata <- data.table::copy(tm_chuncked)
+        rm(tm_chuncked)
+        gc()
+      } else {
+        newtreedata <- data.table::rbindlist(list(newtreedata, tm_chuncked))
+        rm(tm_chuncked)
+        gc()
+      }
     }
+    rm(TreeMeasurements)
+    gc()
+    writeISMC(savePath = savePath, saveName = saveName,
+              tableName = "TreeMeasurements", saveFormat = saveFormat,
+              thedata = newtreedata)
+    rm(newtreedata)
+    gc()
   }
-  rm(TreeMeasurements)
-  gc()
-  writeISMC(savePath = savePath, saveName = saveName,
-            tableName = "TreeMeasurements", saveFormat = saveFormat,
-            thedata = newtreedata)
-  rm(newtreedata)
-  gc()
+
 
   TreeDamageOccurrences <-
     dbGetQuery(con,
@@ -479,6 +657,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
@@ -493,7 +674,10 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, sequence_number")) %>%
     data.table
@@ -536,6 +720,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
@@ -551,7 +738,10 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, location_from, location_to")) %>%
     data.table
@@ -594,6 +784,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
@@ -609,7 +802,10 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, log_number")) %>%
     data.table
@@ -646,12 +842,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number")) %>%
     data.table
   StumpTallies <- cleanColumns(StumpTallies, level = "site_visit")
@@ -680,12 +882,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number")) %>%
     data.table
   SiteNavigation <- cleanColumns(SiteNavigation, level = "site_visit")
@@ -726,12 +934,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number")) %>%
     data.table
   IntegratedPlotCenter <- cleanColumns(IntegratedPlotCenter, level = "site_visit")
@@ -767,12 +981,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number")) %>%
     data.table
   ReferencePoint <- cleanColumns(ReferencePoint, level = "site_visit")
@@ -817,12 +1037,18 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.sample_site ss
                       on ss.sample_site_guic = ssv.sample_site_guic
 
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "order by
+                      "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      order by
                       site_identifier, visit_number")) %>%
     data.table
   TiePoint <- cleanColumns(TiePoint, level = "site_visit")
