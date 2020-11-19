@@ -16,6 +16,10 @@ getServer <- function(databaseName, envir = "PROD"){
       connect_string <- "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
       (HOST = nrcdb01.bcgov)(PORT = 1521)))
       (CONNECT_DATA = (SERVICE_NAME = ISMCTST.NRS.BCGOV)))"
+    } else if (envir == "PROD"){
+      connect_string <- "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)
+      (HOST = nrkdb01.bcgov)(PORT = 1521)))
+      (CONNECT_DATA = (SERVICE_NAME = ismcprd.nrs.bcgov)))"
     }
   } else {
     stop("basebaseName must be specified among GYS, VGIS and ISMC")
