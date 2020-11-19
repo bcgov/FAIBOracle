@@ -26,7 +26,7 @@
 #'         StumpTallies, SiteNavigation,
 #'         IntegratedPlotCenter, ReferencePoint and TiePoint.
 #'
-#' @importFrom data.table ':=' data.table
+#' @importFrom data.table ':=' data.table year
 #' @importFrom dplyr '%>%'
 #' @importFrom ROracle dbConnect dbGetQuery dbDisconnect
 #' @importFrom DBI dbDriver
@@ -119,6 +119,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       from app_ismc.sample_site_visit ssv
                       where ssv.sample_site_guic = ss.sample_site_guic
 
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and ssv.sample_site_purpose_type_code in ", sampleType,
                       ")
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
@@ -164,6 +165,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       from app_ismc.sample_site_visit ssv
                       where ssv.sample_site_guic = ss.sample_site_guic
 
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and ssv.sample_site_purpose_type_code in ", sampleType,
                       ")
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
@@ -204,11 +206,12 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, project_name, sample_site_purpose_type_code")) %>%
     data.table
   SampleSiteVisits <- cleanColumns(SampleSiteVisits, level = "site_visit")
-  allyears <- unique(year(SampleSiteVisits$SAMPLE_SITE_VISIT_START_DATE))
+  allyears <- unique(data.table::year(SampleSiteVisits$SAMPLE_SITE_VISIT_START_DATE))
   writeISMC(savePath = savePath, saveName = saveName,
             tableName = "SampleSiteVisits", saveFormat = saveFormat,
             thedata = SampleSiteVisits)
@@ -255,6 +258,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, project_name")) %>%
     data.table
@@ -300,6 +304,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, project_name, plot_category_code, plot_number")) %>%
     data.table
@@ -346,6 +351,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, project_name")) %>%
     data.table
@@ -395,6 +401,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       ssv.sample_site_purpose_type_code in ", sampleType,
                       "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, plot_number, tree_species_code, small_tree_tally_class_code")) %>%
     data.table
@@ -454,6 +461,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
                       "and extract(year from ssv.sample_site_visit_start_date) <= 2000
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
       } else {
@@ -503,6 +511,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
                       "and extract(year from ssv.sample_site_visit_start_date) > 2000
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and extract(year from ssv.sample_site_visit_start_date) <= ", indiyear,
                       "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
@@ -587,7 +596,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      "and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
     gc()
     chunckNum <- as.integer(nrow(TreeMeasurements)/1000000)
@@ -677,6 +687,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, sequence_number")) %>%
@@ -741,6 +752,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, location_from, location_to")) %>%
@@ -805,6 +817,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, log_number")) %>%
@@ -853,6 +866,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -893,6 +907,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -945,6 +960,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -992,6 +1008,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -1048,6 +1065,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       "
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number")) %>%
     data.table
