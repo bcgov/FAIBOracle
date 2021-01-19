@@ -56,6 +56,7 @@ steps:
 After **ROracle** is installed, our package can be installed using
 following codes:
 
+    install.packages(c("dplyr", "data.table", "rmarkdown", "openxlsx"))
     install.packages("path/to/FAIBOracle_??.tar.gz",
                      repos = NULL, 
                      INSTALL_opts = "--no-multiarch")
