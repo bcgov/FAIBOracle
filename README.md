@@ -43,9 +43,9 @@ steps:
     and save it to a target path, say C:/your/path/to/roracle
 
 -   Open CMD prompt and make some specifications
-    -   set PATH=C:\\oracle\\instantclient\_?\_?
+    -   set PATH=C:\\oracle\\instantclient\_?\_?;\\path\\to\\Rtools\\bin
     -   set OCI\_LIB64=C:\\oracle\\instantclient\_?\_?
-    -   set OCI\_INC=C:\\oracle*?*?\\sdk\\include
+    -   set OCI\_INC=C:\\oracle\\instantclient\_?\_?\\sdk\\include
 -   Install ROracle in CMD prompt using
     -   “C:/path/to/R/bin/x64/R” CMD INSTALL –build
         “C:/Your/Path/To/oracle/ROracle\_1.1-10.tar.gz”

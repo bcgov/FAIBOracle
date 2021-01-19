@@ -35,9 +35,9 @@ To install our package, **ROracle** package must be installed in your R environm
  * Download an ROracle from CRAN on [here](https://cran.r-project.org/web/packages/ROracle/index.html) and save it to a target path, say C:/your/path/to/roracle
  
  * Open CMD prompt and make some specifications
-     + set PATH=C:\\oracle\\instantclient_?_?
+     + set PATH=C:\\oracle\\instantclient_?_?;\\path\\to\\Rtools\\bin
      + set OCI_LIB64=C:\\oracle\\instantclient_?_?
-     + set OCI_INC=C:\\oracle\instantclient_?_?\\sdk\\include
+     + set OCI_INC=C:\\oracle\\instantclient_?_?\\sdk\\include
  * Install ROracle in CMD prompt using
      + "C:/path/to/R/bin/x64/R" CMD INSTALL --build "C:/Your/Path/To/oracle/ROracle_1.1-10.tar.gz"
  * Sometimes, the include files in **C:\\oracle\instantclient_?_?\\sdk\\include** must be manually copied to **C:/path/to/R/include**, due to the permission issue.
