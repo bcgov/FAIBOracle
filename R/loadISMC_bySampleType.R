@@ -411,10 +411,11 @@ loadISMC_bySampleType <- function(userName, passWord, env,
             thedata = SmallLiveTreeTallies)
   rm(SmallLiveTreeTallies)
   gc()
+
   if("PSP" %in% sampleType_org){
     year_max <- max(allyears, na.rm = TRUE)
-    for (indiyear in c(2000, year_max)) {
-      if(indiyear == 2000){
+    for (indiyear in c(1960, 1965, 1970, 1975, 1980, 1990, 2000, year_max)) {
+      if(indiyear == 1960){
         TreeMeasurements <-
           dbGetQuery(con,
                      paste0("select
@@ -460,10 +461,11 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "and extract(year from ssv.sample_site_visit_start_date) <= 2000
+                            "and extract(year from ssv.sample_site_visit_start_date) <= 1960
                       and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
+        lastyear <- indiyear
       } else {
         TreeMeasurements <-
           dbGetQuery(con,
@@ -510,11 +512,12 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "and extract(year from ssv.sample_site_visit_start_date) > 2000
-                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                            "and extract(year from ssv.sample_site_visit_start_date) > ", lastyear,
+                            "and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and extract(year from ssv.sample_site_visit_start_date) <= ", indiyear,
-                      "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                            "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
+        lastyear <- indiyear
       }
       gc()
       chunckNum <- as.integer(nrow(TreeMeasurements)/1000000)
@@ -550,6 +553,28 @@ loadISMC_bySampleType <- function(userName, passWord, env,
       rm(newtreedata)
       gc()
     }
+    for (indiyear in c(1960, 1965, 1970, 1975, 1980, 1990, 2000, year_max)){
+      if(saveFormat == "rds"){
+        indidata <- readRDS(file.path(savePath, paste0(saveName, "_", "TreeMeasurements_to", indiyear, ".", saveFormat)))
+      } else {
+        indidata <- read.table(file.path(savePath, paste0(saveName, "_", "TreeMeasurements_to", indiyear, ".", saveFormat)))
+      }
+      unlink(file.path(savePath, paste0(saveName, "_", "TreeMeasurements_to", indiyear, ".", saveFormat)),
+             recursive = TRUE)
+      if(indiyear == 1960){
+        alldata <- indidata
+      } else {
+        alldata <- rbind(alldata, indidata)
+      }
+      rm(indidata)
+      gc()
+    }
+    writeISMC(savePath = savePath, saveName = saveName,
+              tableName = "TreeMeasurements",
+              saveFormat = saveFormat,
+              thedata = alldata)
+    rm(alldata)
+    gc()
   } else {
     TreeMeasurements <-
       dbGetQuery(con,
@@ -596,7 +621,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                        "and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)"))
     gc()
@@ -635,9 +660,14 @@ loadISMC_bySampleType <- function(userName, passWord, env,
   }
 
 
-  TreeDamageOccurrences <-
-    dbGetQuery(con,
-               paste0("select
+
+  if("PSP" %in% sampleType_org){
+    year_max <- max(allyears, na.rm = TRUE)
+    for (indiyear in c(1980, 2000, year_max)) {
+      if(indiyear == 1980){
+        TreeDamageOccurrences <-
+          dbGetQuery(con,
+                     paste0("select
                       ss.site_identifier,
                       ssv.visit_number,
                       pt.plot_category_code,
@@ -684,28 +714,183 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "
+                            " and extract(year from ssv.sample_site_visit_start_date) <= 1960
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
                       and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, sequence_number")) %>%
-    data.table
+          data.table
+        lastyear <- indiyear
+      } else {
+        TreeDamageOccurrences <-
+          dbGetQuery(con,
+                     paste0("select
+                      ss.site_identifier,
+                      ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      tr.tree_number,
+                      td.tree_species_code,
+                      tm.diameter,
+                      tm.length,
+                      tdo.*,
+                      das.*
 
-  TreeDamageOccurrences <- cleanColumns(TreeDamageOccurrences, level = "tree")
-  writeISMC(savePath = savePath, saveName = saveName,
-            tableName = "TreeDamageOccurrences", saveFormat = saveFormat,
-            thedata = TreeDamageOccurrences)
-  rm(TreeDamageOccurrences)
-  gc()
+                      from
+                      app_ismc.tree_damage_occurrence tdo
+
+                      left join app_ismc.damage_agent_severity das
+                      on das.damage_agent_severity_guic = tdo.damage_agent_severity_guic
+
+                      left join app_ismc.tree_measurement tm
+                      on tm.tree_measurement_guic = tdo.tree_measurement_guic
+
+                      left join app_ismc.sample_measurement sm
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
+
+                      left join app_ismc.sample_site_visit ssv
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.sample_site ss
+                      on ss.sample_site_guic = ssv.sample_site_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.ground_sample_project gsp
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      left join app_ismc.tree tr
+                      on tr.tree_guic = tm.tree_guic
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guic = tr.plot_guic
+
+                      left join app_ismc.tree_detail td on td.tree_guic = tm.tree_guic
+                      and td.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      where
+                      ssv.sample_site_purpose_type_code in ", sampleType,
+                            " and extract(year from ssv.sample_site_visit_start_date) > ", lastyear,
+                            " and extract(year from ssv.sample_site_visit_start_date) <= ", indiyear,
+                            "and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                      order by
+                      site_identifier, visit_number, plot_category_code,
+                      plot_number, tree_number, sequence_number")) %>%
+          data.table
+        lastyear <- indiyear
+      }
+      gc()
+      TreeDamageOccurrences <- cleanColumns(TreeDamageOccurrences, level = "tree")
+      writeISMC(savePath = savePath, saveName = saveName,
+                tableName = paste0("TreeDamageOccurrences_to", indiyear),
+                saveFormat = saveFormat,
+                thedata = TreeDamageOccurrences)
+      rm(TreeDamageOccurrences)
+      gc()
+    }
+    rm(lastyear, indiyear)
+    for (indiyear in c(1980, 2000, year_max)){
+      if(saveFormat == "rds"){
+        indidata <- readRDS(file.path(savePath, paste0(saveName, "_", "TreeDamageOccurrences_to", indiyear, ".", saveFormat)))
+      } else {
+        indidata <- read.table(file.path(savePath, paste0(saveName, "_", "TreeDamageOccurrences_to", indiyear, ".", saveFormat)))
+      }
+      unlink(file.path(savePath, paste0(saveName, "_", "TreeDamageOccurrences_to", indiyear, ".", saveFormat)),
+             recursive = TRUE)
+      if(indiyear == 1980){
+        alldata <- indidata
+      } else {
+        alldata <- rbind(alldata, indidata)
+      }
+      rm(indidata)
+      gc()
+    }
+    writeISMC(savePath = savePath, saveName = saveName,
+              tableName = "TreeDamageOccurrences",
+              saveFormat = saveFormat,
+              thedata = alldata)
+    rm(alldata)
+    gc()
+  } else {
+    TreeDamageOccurrences <-
+      dbGetQuery(con,
+                 paste0("select
+                      ss.site_identifier,
+                      ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      tr.tree_number,
+                      td.tree_species_code,
+                      tm.diameter,
+                      tm.length,
+                      tdo.*,
+                      das.*
+
+                      from
+                      app_ismc.tree_damage_occurrence tdo
+
+                      left join app_ismc.damage_agent_severity das
+                      on das.damage_agent_severity_guic = tdo.damage_agent_severity_guic
+
+                      left join app_ismc.tree_measurement tm
+                      on tm.tree_measurement_guic = tdo.tree_measurement_guic
+
+                      left join app_ismc.sample_measurement sm
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
+
+                      left join app_ismc.sample_site_visit ssv
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.sample_site ss
+                      on ss.sample_site_guic = ssv.sample_site_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.ground_sample_project gsp
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      left join app_ismc.tree tr
+                      on tr.tree_guic = tm.tree_guic
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guic = tr.plot_guic
+
+                      left join app_ismc.tree_detail td on td.tree_guic = tm.tree_guic
+                      and td.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      where
+                      ssv.sample_site_purpose_type_code in ", sampleType,
+                        "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                      order by
+                      site_identifier, visit_number, plot_category_code,
+                      plot_number, tree_number, sequence_number")) %>%
+      data.table
+
+    TreeDamageOccurrences <- cleanColumns(TreeDamageOccurrences, level = "tree")
+    writeISMC(savePath = savePath, saveName = saveName,
+              tableName = "TreeDamageOccurrences", saveFormat = saveFormat,
+              thedata = TreeDamageOccurrences)
+    rm(TreeDamageOccurrences)
+    gc()
+  }
 
 
-
-
-  TreeLossIndicators <-
-    dbGetQuery(con,
-               paste0("select
+  if("PSP" %in% sampleType_org){
+    year_max <- max(allyears, na.rm = TRUE)
+    for (indiyear in c(1960, 1970, 1980, 1990, 2000, year_max)) {
+      if(indiyear == 1960){
+        TreeLossIndicators <-
+          dbGetQuery(con,
+                     paste0("select
                       ss.site_identifier,
                       ssv.visit_number,
                       pt.plot_category_code,
@@ -749,20 +934,170 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
-                      "
+                            "and extract(year from ssv.sample_site_visit_start_date) <= 1960
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
                       and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
                       order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, location_from, location_to")) %>%
-    data.table
-  TreeLossIndicators <- cleanColumns(TreeLossIndicators, level = "tree")
-  writeISMC(savePath = savePath, saveName = saveName,
-            tableName = "TreeLossIndicators", saveFormat = saveFormat,
-            thedata = TreeLossIndicators)
-  rm(TreeLossIndicators)
-  gc()
+          data.table
+        lastyear <- indiyear
+      } else {
+        TreeLossIndicators <-
+          dbGetQuery(con,
+                     paste0("select
+                      ss.site_identifier,
+                      ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      tr.tree_number,
+                      td.tree_species_code,
+                      tm.diameter,
+                      tm.length,
+                      tli.*
+
+                      from
+                      app_ismc.tree_loss_indicator tli
+
+                      left join app_ismc.tree_measurement tm
+                      on tm.tree_measurement_guic = tli.tree_measurement_guic
+
+                      left join app_ismc.sample_measurement sm
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
+
+                      left join app_ismc.sample_site_visit ssv
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.sample_site ss
+                      on ss.sample_site_guic = ssv.sample_site_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.ground_sample_project gsp
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      left join app_ismc.tree tr
+                      on tr.tree_guic = tm.tree_guic
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guic = tr.plot_guic
+
+                      left join app_ismc.tree_detail td
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      where
+                      ssv.sample_site_purpose_type_code in ", sampleType,
+                            " and extract(year from ssv.sample_site_visit_start_date) > ", lastyear,
+                            " and extract(year from ssv.sample_site_visit_start_date) <= ", indiyear,
+                            " and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                      order by
+                      site_identifier, visit_number, plot_category_code,
+                      plot_number, tree_number, location_from, location_to")) %>%
+          data.table
+        lastyear <- indiyear
+      }
+      gc()
+      writeISMC(savePath = savePath, saveName = saveName,
+                tableName = paste0("TreeLossIndicators_to", indiyear),
+                saveFormat = saveFormat,
+                thedata = TreeLossIndicators)
+      rm(TreeLossIndicators)
+      gc()
+    }
+    rm(lastyear, indiyear)
+    for (indiyear in c(1960, 1970, 1980, 1990, 2000, year_max)){
+      if(saveFormat == "rds"){
+        indidata <- readRDS(file.path(savePath, paste0(saveName, "_", "TreeLossIndicators_to", indiyear, ".", saveFormat)))
+      } else {
+        indidata <- read.table(file.path(savePath, paste0(saveName, "_", "TreeLossIndicators_to", indiyear, ".", saveFormat)))
+      }
+      unlink(file.path(savePath, paste0(saveName, "_", "TreeLossIndicators_to", indiyear, ".", saveFormat)),
+             recursive = TRUE)
+      if(indiyear == 1960){
+        alldata <- indidata
+      } else {
+        alldata <- rbind(alldata, indidata)
+      }
+      rm(indidata)
+      gc()
+    }
+    writeISMC(savePath = savePath, saveName = saveName,
+              tableName = "TreeLossIndicators",
+              saveFormat = saveFormat,
+              thedata = alldata)
+    rm(alldata)
+    gc()
+  } else {
+    TreeLossIndicators <-
+      dbGetQuery(con,
+                 paste0("select
+                      ss.site_identifier,
+                      ssv.visit_number,
+                      pt.plot_category_code,
+                      pt.plot_number,
+                      tr.tree_number,
+                      td.tree_species_code,
+                      tm.diameter,
+                      tm.length,
+                      tli.*
+
+                      from
+                      app_ismc.tree_loss_indicator tli
+
+                      left join app_ismc.tree_measurement tm
+                      on tm.tree_measurement_guic = tli.tree_measurement_guic
+
+                      left join app_ismc.sample_measurement sm
+                      on sm.sample_measurement_guic = tm.sample_measurement_guic
+
+                      left join app_ismc.sample_site_visit ssv
+                      on ssv.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      left join app_ismc.sample_site ss
+                      on ss.sample_site_guic = ssv.sample_site_guic
+
+                      left join app_ismc.psp_sample_site pspss
+                      on pspss.sample_site_guic = ss.sample_site_guic
+
+                      left join app_ismc.ground_sample_project gsp
+                      on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      left join app_ismc.tree tr
+                      on tr.tree_guic = tm.tree_guic
+
+                      left join app_ismc.plot pt
+                      on pt.plot_guic = tr.plot_guic
+
+                      left join app_ismc.tree_detail td
+                      on td.tree_guic = tm.tree_guic and
+                      td.sample_site_visit_guic = sm.sample_site_visit_guic
+
+                      where
+                      ssv.sample_site_purpose_type_code in ", sampleType,
+                        "
+                      and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
+                      or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
+                      and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+                      order by
+                      site_identifier, visit_number, plot_category_code,
+                      plot_number, tree_number, location_from, location_to")) %>%
+      data.table
+    TreeLossIndicators <- cleanColumns(TreeLossIndicators, level = "tree")
+    writeISMC(savePath = savePath, saveName = saveName,
+              tableName = "TreeLossIndicators", saveFormat = saveFormat,
+              thedata = TreeLossIndicators)
+    rm(TreeLossIndicators)
+    gc()
+  }
+
+
+
+
 
 
 
