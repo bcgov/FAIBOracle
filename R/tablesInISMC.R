@@ -23,7 +23,7 @@
 tablesInISMC <- function(userName, passWord, env, columnNames = TRUE){
   drv <- dbDriver("Oracle")
   connect_to_ismc <- getServer(databaseName = "ISMC",
-                                 envir = env)
+                                 envir = toupper(env))
   con <- dbConnect(drv, username = userName,
                    password = passWord,
                    dbname = connect_to_ismc)
@@ -35,7 +35,9 @@ tablesInISMC <- function(userName, passWord, env, columnNames = TRUE){
     alltables_new <- data.table::copy(alltables)
     alltables_new[, oracleName := paste0(DataBase, ".", TableName)]
     alltables_new <- alltables_new[!(oracleName %in% c("APP_ISMC.POINT_LOCATION",
-                                                     "APP_ISMC.BIOGEOCLIMATIC_POLY_SHADOW"))]
+                                                     "APP_ISMC.BIOGEOCLIMATIC_POLY_SHADOW",
+                                                     "APP_ISMC.SITE_STATISTICS_VW",
+                                                     "APP_ISMC.VISIT_STATISTICS_VW"))]
     alltables <- data.table(DataBase = character(),
                             TableName = character(),
                             columnName = character())
