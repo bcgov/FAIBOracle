@@ -2,6 +2,7 @@
 inst/doc
 .Rhistory
 developmentTools.R
+developmentCodes.R
 *.csv
 *.rdata
 *.rds
