@@ -2,8 +2,13 @@
 See https://github.com/BCDevExchange/Our-Project-Docs/blob/master/discussion/projectstates.md
 If you have bcgovr installed and you use RStudio, click the 'Insert BCDevex Badge' Addin. -->
 
-FAIBOracle
-==========
+# FAIBOracle
+
+<!-- badges: start -->
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+<!-- badges: end -->
 
 The package is used to load data from three major forest inventory
 databases in Forest Analysis and Inventory Branch: VGIS, GYS and ISMC.
@@ -43,12 +48,16 @@ steps:
     and save it to a target path, say C:/your/path/to/roracle
 
 -   Open CMD prompt and make some specifications
+
     -   set PATH=C:\\oracle\\instantclient\_?\_?;\\path\\to\\Rtools\\bin
-    -   set OCI\_LIB64=C:\\oracle\\instantclient\_?\_?
-    -   set OCI\_INC=C:\\oracle\\instantclient\_?\_?\\sdk\\include
+    -   set OCI_LIB64=C:\\oracle\\instantclient\_?\_?
+    -   set OCI_INC=C:\\oracle\\instantclient\_?\_?\\sdk\\include
+
 -   Install ROracle in CMD prompt using
+
     -   “C:/path/to/R/bin/x64/R” CMD INSTALL –build
-        “C:/Your/Path/To/oracle/ROracle\_1.1-10.tar.gz”
+        “C:/Your/Path/To/oracle/ROracle_1.1-10.tar.gz”
+
 -   Sometimes, the include files in **C:\\oracle*?*?\\sdk\\include**
     must be manually copied to **C:/path/to/R/include**, due to the
     permission issue.

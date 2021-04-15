@@ -18,6 +18,12 @@ If you have bcgovr installed and you use RStudio, click the 'Insert BCDevex Badg
 
 # FAIBOracle
 
+<!-- badges: start -->
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+<!-- badges: end -->
+
 The package is used to load data from three major forest inventory databases in Forest Analysis and Inventory Branch: VGIS, GYS and ISMC. VGIS is the database for ground sample data in NVAF, VRI phase II, changing monitoring inventory (CMI), young stand monitoring (YSM) and Lidar projects (L and B). GYS is the home for natural growth PSP sample data and TSPs. ISMC stands for Inventory Sample Management Consolidation, and is the home for both data from VGIS and GYS. Currently, ISMC is under development. 
 
 
