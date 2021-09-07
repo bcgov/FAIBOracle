@@ -9,7 +9,7 @@
 #' @param env character, Specifies which environment the data reside. Currently,
 #'                               the function supports \code{INT} (intergration)
 #'                               and \code {TEST} (test) environment.
-#' @param siteName character, Site name.
+#' @param siteID character, Site name.
 #' @param savePath character, Specifies the path to save your outputs. If missing, the current working
 #'                 directory will be choosed.
 #'
@@ -37,10 +37,10 @@
 #' @importFrom utils write.csv write.table
 #' @export
 #'
-#' @rdname loadISMC_bySiteName
+#' @rdname loadISMC_bySiteID
 #' @author Yong Luo
-loadISMC_bySiteName <- function(userName, passWord, env,
-                                siteName,
+loadISMC_bySiteID <- function(userName, passWord, env,
+                                siteID,
                                 savePath = ".", saveName,
                                 saveFormat = "rdata",
                                 overWrite = FALSE){
@@ -55,12 +55,12 @@ loadISMC_bySiteName <- function(userName, passWord, env,
     on.exit(options(thisopt))
     stop()
   }
-  siteName_org <- siteName
-  if(length(siteName) == 1){
-    siteName <- paste0("('", siteName,"')")
+  siteID_org <- siteID
+  if(length(siteID) == 1){
+    siteID <- paste0("('", siteID,"')")
   } else {
 
-    siteName <- paste0("('", paste0(siteName, collapse = "', '"),"')")
+    siteID <- paste0("('", paste0(siteID, collapse = "', '"),"')")
   }
   drv <- dbDriver("Oracle")
   connect_to_ismc <- getServer(databaseName = "ISMC",
@@ -100,21 +100,21 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on rcl.areal_unit_guic = pspss.areal_unit_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by site_identifier")) %>%
     data.table
 
   if(nrow(SampleSites) == 0){
     stop(paste0("There is no record for the sample site(s): ",
-                paste0(siteName_org, collapse = ", ")))
+                paste0(siteID_org, collapse = ", ")))
   }
 
-  norecordsample <- siteName_org[!(siteName_org %in% unique(SampleSites$SITE_IDENTIFIER))]
+  norecordsample <- siteID_org[!(siteID_org %in% unique(SampleSites$SITE_IDENTIFIER))]
   if(length(norecordsample) != 0){
     warning(paste0("There is no record for the sample site(s): ",
                    paste0(norecordsample, collapse = ", ")))
   }
-  rm(siteName_org, norecordsample)
+  rm(siteID_org, norecordsample)
   SampleSites <- cleanColumns(SampleSites, level = "sample_site")
   SampleSites <- unique(SampleSites)
 
@@ -131,7 +131,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on ss.sample_site_guic = an.sample_site_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by site_identifier, sequence_number")) %>%
     data.table
   AccessNotes <- cleanColumns(AccessNotes, level = "sample_site")
@@ -154,7 +154,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by site_identifier, visit_number, project_name,
                       sample_site_purpose_type_code")) %>%
     data.table
@@ -191,7 +191,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on cc.ground_sample_human_rsrce_guic = gsca.ground_sample_human_rsrce_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, project_name")) %>%
     data.table
@@ -224,7 +224,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, project_name, plot_category_code, plot_number")) %>%
     data.table
@@ -253,7 +253,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on ss.sample_site_guic = ssv.sample_site_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, project_name")) %>%
     data.table
@@ -291,7 +291,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on pt.plot_guic = sm.plot_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, plot_number, visit_number, tree_species_code, small_tree_tally_class_code")) %>%
     data.table
@@ -345,7 +345,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, plot_category_code, plot_number, tree_number")) %>%
     data.table
@@ -399,7 +399,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       and td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, sequence_number")) %>%
@@ -452,7 +452,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, location_from, location_to")) %>%
@@ -507,7 +507,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       td.sample_site_visit_guic = sm.sample_site_visit_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number, plot_category_code,
                       plot_number, tree_number, log_number")) %>%
@@ -544,7 +544,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -572,7 +572,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -611,7 +611,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -648,7 +648,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number")) %>%
     data.table
@@ -692,7 +692,7 @@ loadISMC_bySiteName <- function(userName, passWord, env,
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
                       where
-                      ss.site_identifier in ", siteName,
+                      ss.site_identifier in ", siteID,
                       "order by
                       site_identifier, visit_number")) %>%
     data.table
