@@ -84,6 +84,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
     dbGetQuery(con,
                paste0("select
                       ss.*,
+                      ss.comment_text as sample_site_comment,
                       plc.utm_zone,
                       plc.utm_northing,
                       plc.utm_easting,
@@ -187,7 +188,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                paste0("select
                       ss.site_identifier,
                       gsp.*,
-                      ssv.*
+                      gsp.comment_text as ground_sample_project_comment,
+                      ssv.*,
+                      ssv.comment_text as sample_site_visit_comment
 
                       from
                       app_ismc.sample_site_visit ssv
@@ -207,9 +210,12 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       and (pspss.PSP_SAMPLE_SITE_TYPE_CODE not in ('S')
                       or pspss.PSP_SAMPLE_SITE_TYPE_CODE is null)
                       and ssv.SAMPLE_SITE_VISIT_STATUS_CODE in ('ACC', 'APP', 'INACTIVE')
+
+
                       order by
                       site_identifier, visit_number, project_name, sample_site_purpose_type_code")) %>%
     data.table
+
   SampleSiteVisits <- cleanColumns(SampleSiteVisits, level = "site_visit")
   allyears <- unique(data.table::year(SampleSiteVisits$SAMPLE_SITE_VISIT_START_DATE))
   writeISMC(savePath = savePath, saveName = saveName,
@@ -229,6 +235,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       ssv.sample_site_purpose_type_code,
                       gsca.*,
                       gshr.*,
+                      gshr.comment_text as ground_sample_human_rsrce_comment,
                       cc.*
 
                       from
@@ -279,7 +286,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
                       pd.*,
-                      pt.*
+                      pt.*,
+                      pt.comment_text as plot_comment
 
                       from
                       app_ismc.plot_detail pd
@@ -325,7 +333,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
-                      sm.*
+                      sm.*,
+                      sm.comment_text as sample_measurement_comment
 
                       from
                       app_ismc.sample_measurement sm
@@ -374,7 +383,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
                       sm.measurement_date,
-                      sltt.*
+                      sltt.*,
+                      sltt.comment_text as small_live_tree_tally_comment
 
                       from
                       app_ismc.small_live_tree_tally sltt
@@ -425,7 +435,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       pt.plot_number,
                       tr.*,
                       td.*,
+                      td.comment_text as tree_detail_comment,
                       tm.*,
+                      tm.comment_text as tree_measurement_comment,
                       vtm.*
 
                       from
@@ -476,7 +488,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       pt.plot_number,
                       tr.*,
                       td.*,
+                      td.comment_text as tree_detail_comment,
                       tm.*,
+                      tm.comment_text as tree_measurement_comment,
                       vtm.*
 
                       from
@@ -585,7 +599,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       pt.plot_number,
                       tr.*,
                       td.*,
+                      td.comment_text as tree_detail_comment,
                       tm.*,
+                      tm.comment_text as tree_measurement_comment,
                       vtm.*
 
                       from
@@ -1174,7 +1190,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
-                      st.*
+                      st.*,
+                      st.comment_text as stump_tally_comment
                       from
                       app_ismc.stump_tally st
 
@@ -1221,7 +1238,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.project_name,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
-                      sn.*
+                      sn.*,
+                      sn.comment_text as site_navigation_comment
                       from
                       app_ismc.site_navigation sn
 
@@ -1423,7 +1441,7 @@ cleanColumns <- function(thedata, level){
   indifiledata_names_noid <-
     indifiledata_names_noid[!(indifiledata_names_noid %in% c("CREATE_DATE", "CREATE_USER",
                                                              "UPDATE_DATE", "UPDATE_USER",
-                                                             "REVISION_COUNT"))]
+                                                             "REVISION_COUNT", "COMMENT_TEXT"))]
   thedata <- thedata[,c(indifiledata_names_noid), with = FALSE]
   if(level == "sample_site"){
     frontnames <- c("SITE_IDENTIFIER")
