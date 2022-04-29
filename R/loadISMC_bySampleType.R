@@ -190,7 +190,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.*,
                       gsp.comment_text as ground_sample_project_comment,
                       ssv.*,
-                      ssv.comment_text as sample_site_visit_comment
+                      ssv.comment_text as sample_site_visit_comment,
+                      saxrf.site_access_code,
+                      sacode.description
 
                       from
                       app_ismc.sample_site_visit ssv
@@ -203,6 +205,13 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      left join app_ismc.site_access_xref saxrf
+                      on saxrf.sample_site_visit_guic = ssv.sample_site_visit_guic
+
+                      left join app_ismc.site_access_code sacode
+                      on saxrf.site_access_code = sacode.site_access_code
+
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
