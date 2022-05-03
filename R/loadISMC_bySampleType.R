@@ -192,7 +192,8 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       ssv.*,
                       ssv.comment_text as sample_site_visit_comment,
                       saxrf.site_access_code,
-                      sacode.description
+                      sacode.description,
+                      sampletypecode.DESCRIPTION as SAMPLE_SITE_PURPOSE_TYPE_DESCRIPTION
 
                       from
                       app_ismc.sample_site_visit ssv
@@ -212,6 +213,9 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       left join app_ismc.site_access_code sacode
                       on saxrf.site_access_code = sacode.site_access_code
 
+                      left join app_ismc.SAMPLE_SITE_PURPOSE_TYPE_CODE sampletypecode
+                      on ssv.SAMPLE_SITE_PURPOSE_TYPE_CODE = sampletypecode.SAMPLE_SITE_PURPOSE_TYPE_CODE
+
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
@@ -222,7 +226,7 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
 
                       order by
-                      site_identifier, visit_number, project_name, sample_site_purpose_type_code")) %>%
+                      site_identifier, visit_number")) %>%
     data.table
 
   SampleSiteVisits <- cleanColumns(SampleSiteVisits, level = "site_visit")

@@ -145,7 +145,8 @@ loadISMC_bySiteID <- function(userName, passWord, env,
                       gsp.*,
                       gsp.comment_text as ground_sample_project_comment,
                       ssv.*,
-                      ssv.comment_text as sample_site_visit_comment
+                      ssv.comment_text as sample_site_visit_comment,
+                      sampletypecode.DESCRIPTION as SAMPLE_SITE_PURPOSE_TYPE_DESCRIPTION
 
                       from
                       app_ismc.sample_site_visit ssv
@@ -156,10 +157,12 @@ loadISMC_bySiteID <- function(userName, passWord, env,
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
 
+                      left join app_ismc.SAMPLE_SITE_PURPOSE_TYPE_CODE sampletypecode
+                      on ssv.SAMPLE_SITE_PURPOSE_TYPE_CODE = sampletypecode.SAMPLE_SITE_PURPOSE_TYPE_CODE
+
                       where
                       ss.site_identifier in ", siteID,
-                      "order by site_identifier, visit_number, project_name,
-                      sample_site_purpose_type_code")) %>%
+                      "order by site_identifier, visit_number")) %>%
     data.table
   SampleSiteVisits <- cleanColumns(SampleSiteVisits, level = "site_visit")
 
