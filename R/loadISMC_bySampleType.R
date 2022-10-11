@@ -85,10 +85,11 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                paste0("select
                       ss.*,
                       ss.comment_text as sample_site_comment,
-                      plc.utm_zone,
-                      plc.utm_northing,
-                      plc.utm_easting,
-                      plc.elevation,
+                      ss.elevation as sample_site_elevation,
+                      plc.utm_zone as ip_utm,
+                      plc.utm_northing as ip_nrth,
+                      plc.utm_easting as ip_east,
+                      plc.elevation as ip_elev,
                       plc.point_location_type_code,
                       plc.coordinate_source_code,
                       pspss.*,
@@ -1252,7 +1253,14 @@ loadISMC_bySampleType <- function(userName, passWord, env,
                       gsp.project_number,
                       ssv.sample_site_purpose_type_code,
                       sn.*,
-                      sn.comment_text as site_navigation_comment
+                      sn.comment_text as site_navigation_comment,
+                      pl.utm_zone,
+                      pl.utm_easting,
+                      pl.utm_northing,
+                      pl.elevation,
+                      pl.coordinate_source_code,
+                      pl.point_location_type_code
+
                       from
                       app_ismc.site_navigation sn
 
@@ -1267,6 +1275,14 @@ loadISMC_bySampleType <- function(userName, passWord, env,
 
                       left join app_ismc.ground_sample_project gsp
                       on gsp.ground_sample_project_guic = ssv.ground_sample_project_guic
+
+                      left join app_ismc.integrated_plot_center ipc
+                      on ipc.site_navigation_guic = sn.site_navigation_guic
+
+                      left join app_ismc.point_location pl
+                      on pl.point_location_guic = ipc.point_location_guic
+
+
 
                       where
                       ssv.sample_site_purpose_type_code in ", sampleType,
